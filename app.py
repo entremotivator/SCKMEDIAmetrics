@@ -40,7 +40,6 @@ data = {
         "German": 0.6,
         "Other": 3.0,
     },
-    # Add more data sections
     "estimated_reach": {"post": (1.3, 3.7), "story": (0.246, 0.737)},
     "estimated_impressions": 2.8,
     "audience_interests": {
@@ -174,34 +173,13 @@ data = {
         "Education": 28.2,
         "Health": 24.6,
     },
-    # Add 20 more metrics
-    "additional_metric_1": 20.0,
-    "additional_metric_2": 30.0,
-    "additional_metric_3": 40.0,
-    "additional_metric_4": 50.0,
-    "additional_metric_5": 60.0,
-    "additional_metric_6": 70.0,
-    "additional_metric_7": 80.0,
-    "additional_metric_8": 90.0,
-    "additional_metric_9": 100.0,
-    "additional_metric_10": 110.0,
-    "additional_metric_11": 120.0,
-    "additional_metric_12": 130.0,
-    "additional_metric_13": 140.0,
-    "additional_metric_14": 150.0,
-    "additional_metric_15": 160.0,
-    "additional_metric_16": 170.0,
-    "additional_metric_17": 180.0,
-    "additional_metric_18": 190.0,
-    "additional_metric_19": 200.0,
-    "additional_metric_20": 210.0,
 }
 
 # Function to create a PDF report
 def create_pdf_report(data):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
-    
+
     # Add Company Logo
     logo_path = "sck.png"  # Replace with the actual logo path
     p.drawImage(logo_path, 30, 750, width=100, height=50)
@@ -210,33 +188,89 @@ def create_pdf_report(data):
     p.drawString(150, 750, "Rick Ross Instagram Report")
     p.setFont("Helvetica", 12)
     p.drawString(150, 735, "-----------------------------")
-    
+
+    # Report content
+    report_content = [
+        "Total Followers: {0}M",
+        "Quality Audience: {1}M",
+        "Followers Growth: {2}%",
+        "Engagement Rate: {3}%",
+        "Authentic Engagement per Post: {4}K",
+        "Most Recent Post: {5}",
+        "Global Rank: {6}",
+        "Top Countries:",
+        "Age & Gender:",
+        "Ethnicity:",
+        "Languages:",
+        "Audience Interests:",
+        "Household Income:",
+        "Estimated Reach:",
+        "Estimated Impressions:",
+        "Education Level:",
+        "Marital Status:",
+        "Employment Status:",
+        "Device Usage:",
+        "Social Media Platforms:",
+        "Content Preferences:",
+        "Brand Engagement:",
+        "Post Frequency:",
+        "Content Themes:",
+        "Sponsored Content:",
+        "Influencer Collaborations:",
+        "User Sentiment:",
+        "Engagement Trends:",
+        "Content Virality:",
+        "Audience Location:",
+        "Audience Age Range:",
+        "Content Format Preferences:",
+        "Influencer Marketing Interest:",
+        "Social Causes Support:",
+    ]
+
     y_position = 720
-    for key, value in data.items():
-        if isinstance(value, dict):
+    for content in report_content:
+        if content == "Top Countries:":
             y_position -= 15
             p.setFont("Helvetica-Bold", 12)
-            p.drawString(30, y_position, f"{key.replace('_', ' ').capitalize()}:")
-            for sub_key, sub_value in value.items():
+            p.drawString(150, y_position, content)
+            top_countries = data["top_countries"]
+            for country, value in top_countries.items():
                 y_position -= 15
                 p.setFont("Helvetica", 10)
-                p.drawString(50, y_position, f"{sub_key}: {sub_value}")
-        elif isinstance(value, list) and key == 'estimated_reach':
+                p.drawString(150, y_position, f"{country}: {value}%")
+        elif content in ["Age & Gender:", "Ethnicity:", "Languages:", "Audience Interests:", "Household Income:", "Education Level:", "Marital Status:", "Employment Status:", "Device Usage:", "Social Media Platforms:", "Content Preferences:", "Brand Engagement:", "Post Frequency:", "Content Themes:", "Sponsored Content:", "Influencer Collaborations:", "User Sentiment:", "Engagement Trends:", "Content Virality:", "Audience Location:", "Audience Age Range:", "Content Format Preferences:", "Influencer Marketing Interest:", "Social Causes Support:"]:
             y_position -= 15
             p.setFont("Helvetica-Bold", 12)
-            p.drawString(30, y_position, f"{key.replace('_', ' ').capitalize()}:")
-            for reach_type, (low, high) in value.items():
+            p.drawString(150, y_position, content)
+            metrics_data = data[content.split(':')[0].lower().replace(' ', '_')]
+            df = pd.DataFrame.from_dict(metrics_data, orient='index', columns=['Percentage'])
+            fig, ax = plt.subplots(figsize=(6, 4))
+            ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Blues_d")
+            ax.set_xlabel(content.split(':')[0], fontsize=10)
+            ax.set_ylabel('Percentage', fontsize=10)
+            plt.tight_layout()
+            plt.savefig("temp_plot.png", format="png", bbox_inches="tight")
+            p.drawInlineImage("temp_plot.png", inch, y_position - 15, width=400, height=300)
+        elif content == "Estimated Reach:":
+            y_position -= 15
+            p.setFont("Helvetica-Bold", 12)
+            p.drawString(150, y_position, content)
+            reach_data = data["estimated_reach"]
+            for key, value in reach_data.items():
                 y_position -= 15
                 p.setFont("Helvetica", 10)
-                p.drawString(50, y_position, f"{reach_type.capitalize()}: {low}M - {high}M")
+                p.drawString(150, y_position, f"{key.capitalize()} Reach: {value[0]}M - {value[1]}M")
+        elif content == "Estimated Impressions:":
+            y_position -= 15
+            p.setFont("Helvetica-Bold", 12)
+            p.drawString(150, y_position, content)
+            impressions_data = data["estimated_impressions"]
+            p.setFont("Helvetica", 10)
+            p.drawString(150, y_position - 15, f"Estimated Impressions: {impressions_data}M")
         else:
             y_position -= 15
             p.setFont("Helvetica", 10)
-            p.drawString(30, y_position, f"{key.replace('_', ' ').capitalize()}: {value}")
-
-        if y_position < 100:
-            p.showPage()
-            y_position = 750
+            p.drawString(150, y_position, content.format(*[data[key] for key in content.split(':')[1].split()]))
 
     p.showPage()
     p.save()
@@ -289,50 +323,45 @@ sections = {
     "Content Format Preferences": "content_format_preferences",
     "Influencer Marketing Interest": "influencer_marketing_interest",
     "Social Causes Support": "social_causes_support",
-    # Add 20 more metrics
-    "Additional Metric 1": "additional_metric_1",
-    "Additional Metric 2": "additional_metric_2",
-    "Additional Metric 3": "additional_metric_3",
-    "Additional Metric 4": "additional_metric_4",
-    "Additional Metric 5": "additional_metric_5",
-    "Additional Metric 6": "additional_metric_6",
-    "Additional Metric 7": "additional_metric_7",
-    "Additional Metric 8": "additional_metric_8",
-    "Additional Metric 9": "additional_metric_9",
-    "Additional Metric 10": "additional_metric_10",
-    "Additional Metric 11": "additional_metric_11",
-    "Additional Metric 12": "additional_metric_12",
-    "Additional Metric 13": "additional_metric_13",
-    "Additional Metric 14": "additional_metric_14",
-    "Additional Metric 15": "additional_metric_15",
-    "Additional Metric 16": "additional_metric_16",
-    "Additional Metric 17": "additional_metric_17",
-    "Additional Metric 18": "additional_metric_18",
-    "Additional Metric 19": "additional_metric_19",
-    "Additional Metric 20": "additional_metric_20",
 }
 
 # Display sections
 for section, data_key in sections.items():
     st.header(section)
-    if isinstance(data[data_key], dict):
-        st.text(section)
+    if section == "Top Countries":
+        st.text("Top Countries")
         df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
         fig, ax = plt.subplots(figsize=(8, 6))
         ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Greens_d")
         ax.set_xlabel('Country', fontsize=12)
         ax.set_ylabel('Percentage', fontsize=12)
-        plt.xticks(rotation=45)
         plt.tight_layout()
         st.pyplot(fig)
-    elif isinstance(data[data_key], list) and data_key == 'estimated_reach':
-        st.text(section)
-        for reach_type, (low, high) in data[data_key].items():
-            st.text(f"{reach_type.capitalize()} Reach: {low}M - {high}M")
-    elif data_key == 'estimated_impressions':
-        st.text(f"{section}: {data[data_key]}M")
+    elif section in ["Age & Gender", "Ethnicity", "Languages", "Audience Interests", "Household Income", "Education Level", "Marital Status", "Employment Status", "Device Usage", "Social Media Platforms", "Content Preferences", "Brand Engagement", "Post Frequency", "Content Themes", "Sponsored Content", "Influencer Collaborations", "User Sentiment", "Engagement Trends", "Content Virality", "Audience Location", "Audience Age Range", "Content Format Preferences", "Influencer Marketing Interest", "Social Causes Support"]:
+        df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Blues_d")
+        ax.set_xlabel(section, fontsize=10)
+        ax.set_ylabel('Percentage', fontsize=10)
+        plt.tight_layout()
+        st.pyplot(fig)
+    elif section == "Estimated Reach":
+        reach_data = data[data_key]
+        fig, ax = plt.subplots(figsize=(6, 4))
+        reach_values = [f"{value[0]}M - {value[1]}M" for value in reach_data.values()]
+        ax.bar(reach_data.keys(), reach_values, color='orange')
+        ax.set_xlabel('Reach Type', fontsize=10)
+        ax.set_ylabel('Reach Range', fontsize=10)
+        plt.tight_layout()
+        st.pyplot(fig)
+    elif section == "Estimated Impressions":
+        st.text(f"Estimated Impressions: {data[data_key]}M")
     else:
-        st.metric(section, data[data_key])
+        if isinstance(data[data_key], dict):
+            for key, value in data[data_key].items():
+                st.metric(key, value)
+        else:
+            st.metric(section, data[data_key])
 
 # Generate PDF report
 if st.button("Export Report as PDF"):
