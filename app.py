@@ -40,6 +40,7 @@ data = {
         "German": 0.6,
         "Other": 3.0,
     },
+    # Add more data sections
     "estimated_reach": {"post": (1.3, 3.7), "story": (0.246, 0.737)},
     "estimated_impressions": 2.8,
     "audience_interests": {
@@ -173,6 +174,27 @@ data = {
         "Education": 28.2,
         "Health": 24.6,
     },
+    # Add 20 more metrics
+    "additional_metric_1": 20.0,
+    "additional_metric_2": 30.0,
+    "additional_metric_3": 40.0,
+    "additional_metric_4": 50.0,
+    "additional_metric_5": 60.0,
+    "additional_metric_6": 70.0,
+    "additional_metric_7": 80.0,
+    "additional_metric_8": 90.0,
+    "additional_metric_9": 100.0,
+    "additional_metric_10": 110.0,
+    "additional_metric_11": 120.0,
+    "additional_metric_12": 130.0,
+    "additional_metric_13": 140.0,
+    "additional_metric_14": 150.0,
+    "additional_metric_15": 160.0,
+    "additional_metric_16": 170.0,
+    "additional_metric_17": 180.0,
+    "additional_metric_18": 190.0,
+    "additional_metric_19": 200.0,
+    "additional_metric_20": 210.0,
 }
 
 # Function to create a PDF report
@@ -267,42 +289,50 @@ sections = {
     "Content Format Preferences": "content_format_preferences",
     "Influencer Marketing Interest": "influencer_marketing_interest",
     "Social Causes Support": "social_causes_support",
+    # Add 20 more metrics
+    "Additional Metric 1": "additional_metric_1",
+    "Additional Metric 2": "additional_metric_2",
+    "Additional Metric 3": "additional_metric_3",
+    "Additional Metric 4": "additional_metric_4",
+    "Additional Metric 5": "additional_metric_5",
+    "Additional Metric 6": "additional_metric_6",
+    "Additional Metric 7": "additional_metric_7",
+    "Additional Metric 8": "additional_metric_8",
+    "Additional Metric 9": "additional_metric_9",
+    "Additional Metric 10": "additional_metric_10",
+    "Additional Metric 11": "additional_metric_11",
+    "Additional Metric 12": "additional_metric_12",
+    "Additional Metric 13": "additional_metric_13",
+    "Additional Metric 14": "additional_metric_14",
+    "Additional Metric 15": "additional_metric_15",
+    "Additional Metric 16": "additional_metric_16",
+    "Additional Metric 17": "additional_metric_17",
+    "Additional Metric 18": "additional_metric_18",
+    "Additional Metric 19": "additional_metric_19",
+    "Additional Metric 20": "additional_metric_20",
 }
+
 # Display sections
 for section, data_key in sections.items():
     st.header(section)
-    if data_key in data:
-        if section == "Top Countries":
-            df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
-            fig, ax = plt.subplots(figsize=(8, 6))
-            sns.barplot(x=df.index, y='Percentage', data=df, palette="Greens_d", ax=ax)
-            ax.set_xlabel('Country', fontsize=12)
-            ax.set_ylabel('Percentage', fontsize=12)
-            plt.xticks(rotation=45)
-            plt.tight_layout()
-            st.pyplot(fig)
-        elif section in ["Age & Gender", "Ethnicity", "Languages", "Audience Interests", "Household Income", "Education Level", "Marital Status", "Employment Status", "Device Usage", "Social Media Platforms", "Content Preferences", "Brand Engagement", "Post Frequency", "Content Themes", "Sponsored Content", "Influencer Collaborations", "User Sentiment", "Engagement Trends", "Content Virality", "Audience Location", "Audience Age Range", "Content Format Preferences", "Influencer Marketing Interest", "Social Causes Support"]:
-            df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
-            fig, ax = plt.subplots(figsize=(8, 6))
-            sns.barplot(x=df.index, y='Percentage', data=df, palette="Blues_d", ax=ax)
-            ax.set_xlabel(section, fontsize=12)
-            ax.set_ylabel('Percentage', fontsize=12)
-            plt.xticks(rotation=45)
-            plt.tight_layout()
-            st.pyplot(fig)
-        elif section == "Estimated Reach":
-            reach_data = data[data_key]
-            reach_df = pd.DataFrame(reach_data).T
-            reach_df.columns = ['Min Reach (M)', 'Max Reach (M)']
-            st.dataframe(reach_df)
-        elif section == "Estimated Impressions":
-            st.text(f"Estimated Impressions: {data[data_key]}M")
-        else:
-            if isinstance(data[data_key], dict):
-                for key, value in data[data_key].items():
-                    st.metric(key, value)
-            else:
-                st.metric(section, data[data_key])
+    if isinstance(data[data_key], dict):
+        st.text(section)
+        df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Greens_d")
+        ax.set_xlabel('Country', fontsize=12)
+        ax.set_ylabel('Percentage', fontsize=12)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        st.pyplot(fig)
+    elif isinstance(data[data_key], list) and data_key == 'estimated_reach':
+        st.text(section)
+        for reach_type, (low, high) in data[data_key].items():
+            st.text(f"{reach_type.capitalize()} Reach: {low}M - {high}M")
+    elif data_key == 'estimated_impressions':
+        st.text(f"{section}: {data[data_key]}M")
+    else:
+        st.metric(section, data[data_key])
 
 # Generate PDF report
 if st.button("Export Report as PDF"):
