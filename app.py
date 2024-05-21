@@ -50,6 +50,7 @@ data = {
         "Fashion": 31.0,
         "Social Issues": 22.0,
         "Beauty": 23.0,
+        "Sports": 60.0,  # New metric
     },
     "household_income": {
         "$0K—5K": 8.9,
@@ -69,8 +70,12 @@ def create_pdf_report(data):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
     
-    p.drawString(30, 750, "Rick Ross Instagram Report")
-    p.drawString(30, 735, "-----------------------------")
+    # Add Company Logo
+    logo_path = "company_logo.png"  # Replace with the actual logo path
+    p.drawImage(logo_path, 30, 750, width=100, height=50)
+
+    p.drawString(150, 750, "Rick Ross Instagram Report")
+    p.drawString(150, 735, "-----------------------------")
     
     # Report content
     report_content = [
@@ -86,56 +91,46 @@ def create_pdf_report(data):
         "Ethnicity:",
         "Languages:",
         "Audience Interests:",
-        "Household Income:"
+        "Household Income:",
+        "Estimated Reach:",
+        "Estimated Impressions:"
     ]
     
     y_position = 720
     for content in report_content:
         if content == "Top Countries:":
             y_position -= 15
-            p.drawString(30, y_position, content)
+            p.drawString(150, y_position, content)
             top_countries = data["top_countries"]
             for country, value in top_countries.items():
                 y_position -= 15
-                p.drawString(30, y_position, f"{country}: {value}%")
-        elif content == "Age & Gender:":
+                p.drawString(150, y_position, f"{country}: {value}%")
+            # Plot pie chart for top countries
+            fig, ax = plt.subplots()
+            ax.pie(list(top_countries.values()), labels=list(top_countries.keys()), autopct='%1.1f%%', startangle=90)
+            ax.axis('equal')
+            st.pyplot(fig)
+        elif content in ["Age & Gender:", "Ethnicity:", "Languages:", "Audience Interests:", "Household Income:"]:
             y_position -= 15
-            p.drawString(30, y_position, content)
-            age_gender = data["age_gender"]
-            for key, value in age_gender.items():
-                y_position -= 15
-                p.drawString(30, y_position, f"{key}: {value}%")
-        elif content == "Ethnicity:":
+            p.drawString(150, y_position, content)
+            metrics_data = data[content.split(':')[0].lower().replace(' ', '_')]
+            df = pd.DataFrame(metrics_data, index=[0])
+            st.bar_chart(df)
+        elif content == "Estimated Reach:":
             y_position -= 15
-            p.drawString(30, y_position, content)
-            ethnicity = data["ethnicity"]
-            for key, value in ethnicity.items():
+            p.drawString(150, y_position, content)
+            reach_data = data["estimated_reach"]
+            for key, value in reach_data.items():
                 y_position -= 15
-                p.drawString(30, y_position, f"{key}: {value}%")
-        elif content == "Languages:":
+                p.drawString(150, y_position, f"{key.capitalize()} Reach: {value[0]}M - {value[1]}M")
+        elif content == "Estimated Impressions:":
             y_position -= 15
-            p.drawString(30, y_position, content)
-            languages = data["languages"]
-            for key, value in languages.items():
-                y_position -= 15
-                p.drawString(30, y_position, f"{key}: {value}%")
-        elif content == "Audience Interests:":
-            y_position -= 15
-            p.drawString(30, y_position, content)
-            audience_interests = data["audience_interests"]
-            for key, value in audience_interests.items():
-                y_position -= 15
-                p.drawString(30, y_position, f"{key}: {value}%")
-        elif content == "Household Income:":
-            y_position -= 15
-            p.drawString(30, y_position, content)
-            household_income = data["household_income"]
-            for key, value in household_income.items():
-                y_position -= 15
-                p.drawString(30, y_position, f"{key}: {value}%")
+            p.drawString(150, y_position, content)
+            impressions_data = data["estimated_impressions"]
+            p.drawString(150, y_position - 15, f"Estimated Impressions: {impressions_data}M")
         else:
             y_position -= 15
-            p.drawString(30, y_position, content.format(*[data[key] for key in content.split(':')[1].split()}))
+            p.drawString(150, y_position, content.format(*[data[key] for key in content.split(':')[1].split()]))
     
     p.showPage()
     p.save()
@@ -143,17 +138,17 @@ def create_pdf_report(data):
     return buffer
 
 # Streamlit App
-st.title("Rick Ross Instagram Report")
+st.title("Digital Metrics Report for Investors")
 
 # Sections
 sections = {
-    "Followers": "Total Followers (M)",
-    "Quality Audience": "Quality Audience (M)",
-    "Followers Growth": "Followers Growth (%)",
-    "Engagement Rate": "Engagement Rate (%)",
-    "Authentic Engagement": "Authentic Engagement per Post (K)",
+    "Followers": "followers",
+    "Quality Audience": "quality_audience",
+    "Followers Growth": "followers_growth",
+    "Engagement Rate": "engagement_rate",
+    "Authentic Engagement": "authentic_engagement",
     "Most Recent Post": "most_recent_post",
-    "Global and Country Rank": "Global Rank",
+    "Global and Country Rank": "global_rank",
     "Top Countries": "top_countries",
     "Age & Gender": "age_gender",
     "Ethnicity": "ethnicity",
@@ -168,21 +163,20 @@ sections = {
 for section, data_key in sections.items():
     st.header(section)
     if section == "Top Countries":
-        country_names = list(data[data_key].keys())
-        country_values = list(data[data_key].values())
-        fig, ax = plt.subplots()
-        ax.pie(country_values, labels=country_names, autopct='%1.1f%%', startangle=90)
-        ax.axis('equal')
-        st.pyplot(fig)
+        st.text("Top Countries")
     elif section in ["Age & Gender", "Ethnicity", "Languages", "Audience Interests", "Household Income"]:
-        df = pd.DataFrame(data[data_key], index=[0])
-        st.bar_chart(df)
+        st.bar_chart(pd.DataFrame(data[data_key], index=[0]))
+    elif section == "Estimated Reach":
+        for key, value in data[data_key].items():
+            st.text(f"{key.capitalize()} Reach: {value[0]}M - {value[1]}M")
+    elif section == "Estimated Impressions":
+        st.text(f"Estimated Impressions: {data[data_key]}M")
     else:
         if isinstance(data[data_key], dict):
             for key, value in data[data_key].items():
                 st.metric(key, value)
         else:
-            st.metric(section.split(':')[1], data[data_key])
+            st.metric(section, data[data_key])
 
 # Generate PDF report
 if st.button("Export Report as PDF"):
@@ -190,7 +184,7 @@ if st.button("Export Report as PDF"):
     st.download_button(
         label="Download PDF Report",
         data=pdf_buffer,
-        file_name="Rick_Ross_Instagram_Report.pdf",
+        file_name="Digital_Metrics_Report.pdf",
         mime="application/pdf"
     )
 
