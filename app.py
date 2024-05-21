@@ -72,77 +72,72 @@ def create_pdf_report(data):
     p.drawString(30, 750, "Rick Ross Instagram Report")
     p.drawString(30, 735, "-----------------------------")
     
-    p.drawString(30, 720, f"Total Followers: {data['followers']}M")
-    p.drawString(30, 705, f"Quality Audience: {data['quality_audience']}M")
-    p.drawString(30, 690, f"Followers Growth: {data['followers_growth']}%")
-    p.drawString(30, 675, f"Engagement Rate: {data['engagement_rate']}%")
-    p.drawString(30, 660, f"Authentic Engagement per Post: {data['authentic_engagement']}K")
-    p.drawString(30, 645, f"Most Recent Post: {data['most_recent_post']}")
+    # Report content
+    report_content = [
+        "Total Followers: {0}M",
+        "Quality Audience: {1}M",
+        "Followers Growth: {2}%",
+        "Engagement Rate: {3}%",
+        "Authentic Engagement per Post: {4}K",
+        "Most Recent Post: {5}",
+        "Global Rank: {6}",
+        "Top Countries:",
+        "Age & Gender:",
+        "Ethnicity:",
+        "Languages:",
+        "Audience Interests:",
+        "Household Income:"
+    ]
     
-    p.drawString(30, 630, f"Global Rank: {data['global_rank']}")
-    for country, rank in data['country_rank'].items():
-        p.drawString(30, 615, f"Country Rank in {country}: {rank}")
-    
-    p.showPage()
-    
-    # Top Countries
-    p.drawString(30, 750, "Top Countries:")
-    top_countries = data["top_countries"]
-    y = 735
-    for country, value in top_countries.items():
-        p.drawString(30, y, f"{country}: {value}%")
-        y -= 15
-    
-    p.showPage()
-    
-    # Age & Gender
-    p.drawString(30, 750, "Age & Gender:")
-    age_gender = data["age_gender"]
-    p.drawString(30, 735, f"Male: {age_gender['Male']}%")
-    p.drawString(30, 720, f"Female: {age_gender['Female']}%")
-    
-    p.showPage()
-    
-    # Ethnicity
-    p.drawString(30, 750, "Ethnicity:")
-    ethnicity = data["ethnicity"]
-    y = 735
-    for key, value in ethnicity.items():
-        p.drawString(30, y, f"{key}: {value}%")
-        y -= 15
-    
-    p.showPage()
-    
-    # Languages
-    p.drawString(30, 750, "Languages:")
-    languages = data["languages"]
-    y = 735
-    for key, value in languages.items():
-        p.drawString(30, y, f"{key}: {value}%")
-        y -= 15
-    
-    p.showPage()
-    
-    # Audience Interests
-    p.drawString(30, 750, "Audience Interests:")
-    audience_interests = data["audience_interests"]
-    y = 735
-    for key, value in audience_interests.items():
-        p.drawString(30, y, f"{key}: {value}%")
-        y -= 15
-    
-    p.showPage()
-    
-    # Household Income
-    p.drawString(30, 750, "Household Income:")
-    household_income = data["household_income"]
-    y = 735
-    for key, value in household_income.items():
-        p.drawString(30, y, f"{key}: {value}%")
-        y -= 15
+    y_position = 720
+    for content in report_content:
+        if content == "Top Countries:":
+            y_position -= 15
+            p.drawString(30, y_position, content)
+            top_countries = data["top_countries"]
+            for country, value in top_countries.items():
+                y_position -= 15
+                p.drawString(30, y_position, f"{country}: {value}%")
+        elif content == "Age & Gender:":
+            y_position -= 15
+            p.drawString(30, y_position, content)
+            age_gender = data["age_gender"]
+            for key, value in age_gender.items():
+                y_position -= 15
+                p.drawString(30, y_position, f"{key}: {value}%")
+        elif content == "Ethnicity:":
+            y_position -= 15
+            p.drawString(30, y_position, content)
+            ethnicity = data["ethnicity"]
+            for key, value in ethnicity.items():
+                y_position -= 15
+                p.drawString(30, y_position, f"{key}: {value}%")
+        elif content == "Languages:":
+            y_position -= 15
+            p.drawString(30, y_position, content)
+            languages = data["languages"]
+            for key, value in languages.items():
+                y_position -= 15
+                p.drawString(30, y_position, f"{key}: {value}%")
+        elif content == "Audience Interests:":
+            y_position -= 15
+            p.drawString(30, y_position, content)
+            audience_interests = data["audience_interests"]
+            for key, value in audience_interests.items():
+                y_position -= 15
+                p.drawString(30, y_position, f"{key}: {value}%")
+        elif content == "Household Income:":
+            y_position -= 15
+            p.drawString(30, y_position, content)
+            household_income = data["household_income"]
+            for key, value in household_income.items():
+                y_position -= 15
+                p.drawString(30, y_position, f"{key}: {value}%")
+        else:
+            y_position -= 15
+            p.drawString(30, y_position, content.format(*[data[key] for key in content.split(':')[1].split()}))
     
     p.showPage()
-    
     p.save()
     buffer.seek(0)
     return buffer
@@ -150,80 +145,46 @@ def create_pdf_report(data):
 # Streamlit App
 st.title("Rick Ross Instagram Report")
 
-# Followers Section
-st.header("Followers")
-st.metric("Total Followers (M)", data["followers"])
+# Sections
+sections = {
+    "Followers": "Total Followers (M)",
+    "Quality Audience": "Quality Audience (M)",
+    "Followers Growth": "Followers Growth (%)",
+    "Engagement Rate": "Engagement Rate (%)",
+    "Authentic Engagement": "Authentic Engagement per Post (K)",
+    "Most Recent Post": "most_recent_post",
+    "Global and Country Rank": "Global Rank",
+    "Top Countries": "top_countries",
+    "Age & Gender": "age_gender",
+    "Ethnicity": "ethnicity",
+    "Languages": "languages",
+    "Estimated Reach": "estimated_reach",
+    "Estimated Impressions": "estimated_impressions",
+    "Audience Interests": "audience_interests",
+    "Household Income": "household_income"
+}
 
-# Quality Audience Section
-st.header("Quality Audience")
-st.metric("Quality Audience (M)", data["quality_audience"])
+# Display sections
+for section, data_key in sections.items():
+    st.header(section)
+    if section == "Top Countries":
+        country_names = list(data[data_key].keys())
+        country_values = list(data[data_key].values())
+        fig, ax = plt.subplots()
+        ax.pie(country_values, labels=country_names, autopct='%1.1f%%', startangle=90)
+        ax.axis('equal')
+        st.pyplot(fig)
+    elif section in ["Age & Gender", "Ethnicity", "Languages", "Audience Interests", "Household Income"]:
+        df = pd.DataFrame(data[data_key], index=[0])
+        st.bar_chart(df)
+    else:
+        if isinstance(data[data_key], dict):
+            for key, value in data[data_key].items():
+                st.metric(key, value)
+        else:
+            st.metric(section.split(':')[1], data[data_key])
 
-# Followers Growth Section
-st.header("Followers Growth")
-st.metric("Followers Growth (%)", data["followers_growth"])
-
-# Engagement Rate Section
-st.header("Engagement Rate")
-st.metric("Engagement Rate (%)", data["engagement_rate"])
-
-# Authentic Engagement Section
-st.header("Authentic Engagement")
-st.metric("Authentic Engagement per Post (K)", data["authentic_engagement"])
-
-# Most Recent Post Section
-st.header("Most Recent Post")
-st.text(f"{data['most_recent_post']}")
-
-# Global and Country Rank Section
-st.header("Global and Country Rank")
-st.metric("Global Rank", data["global_rank"])
-for country, rank in data["country_rank"].items():
-    st.metric(f"Country Rank in {country}", rank)
-
-# Top Countries Section
-st.header("Top Countries")
-country_names = list(data["top_countries"].keys())
-country_values = list(data["top_countries"].values())
-fig, ax = plt.subplots()
-ax.pie(country_values, labels=country_names, autopct='%1.1f%%', startangle=90)
-ax.axis('equal')
-st.pyplot(fig)
-
-# Age & Gender Section
-st.header("Age & Gender")
-age_gender_df = pd.DataFrame(data["age_gender"], index=[0])
-st.bar_chart(age_gender_df)
-
-# Ethnicity Section
-st.header("Ethnicity")
-ethnicity_df = pd.DataFrame(data["ethnicity"], index=[0])
-st.bar_chart(ethnicity_df)
-
-# Languages Section
-st.header("Languages")
-languages_df = pd.DataFrame(data["languages"], index=[0])
-st.bar_chart(languages_df)
-
-# Estimated Reach Section
-st.header("Estimated Reach")
-st.metric("Post Reach (M)", f"{data['estimated_reach']['post'][0]} - {data['estimated_reach']['post'][1]}")
-st.metric("Story Reach (K)", f"{data['estimated_reach']['story'][0]} - {data['estimated_reach']['story'][1]}")
-
-# Estimated Impressions Section
-st.header("Estimated Impressions")
-st.metric("Estimated Impressions (M)", data["estimated_impressions"])
-
-# Audience Interests Section
-st.header("Audience Interests")
-interests_df = pd.DataFrame(data["audience_interests"], index=[0])
-st.bar_chart(interests_df)
-
-# Household Income Section
-st.header("Household Income")
-income_df = pd.DataFrame(data["household_income"], index=[0])
-st.bar_chart(income_df)
-
-# Add button to generate PDF report
+# Generate PDF report
 if st.button("Export Report as PDF"):
     pdf_buffer = create_pdf_report(data)
     st.download_button(
