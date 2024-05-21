@@ -307,13 +307,7 @@ st.sidebar.image("sck.png", use_column_width=True)
 st.title("Digital Metrics Report for Investors")
 
 # Display sections
-for section, data_key in sections.items():
-    st.header(section)
-    if section == "Top Countries":
-        st.text("Top Countries")
-        df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
-        fig, ax = plt.subplots(figsize=(8, 6))
-        ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Pastel1")
+
 # Sections
 sections = {
     "Followers": "followers",
