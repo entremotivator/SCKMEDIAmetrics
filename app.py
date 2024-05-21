@@ -5,6 +5,7 @@ import seaborn as sns
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
 
 # Sample Data
 data = {
@@ -145,6 +146,33 @@ data = {
         "Medium": 54.2,
         "Low": 23.4,
     },
+    "audience_location": {
+        "Urban": 62.8,
+        "Suburban": 24.6,
+        "Rural": 12.6,
+    },
+    "audience_age_range": {
+        "18-24": 28.4,
+        "25-34": 36.2,
+        "35-44": 22.8,
+        "45+": 12.6,
+    },
+    "content_format_preferences": {
+        "Short Videos": 72.4,
+        "Long Videos": 38.6,
+        "Carousel Posts": 48.2,
+        "Text Posts": 22.8,
+    },
+    "influencer_marketing_interest": {
+        "Interested": 68.4,
+        "Not Interested": 31.6,
+    },
+    "social_causes_support": {
+        "Environmental": 42.8,
+        "Social Justice": 36.4,
+        "Education": 28.2,
+        "Health": 24.6,
+    },
 }
 
 # Function to create a PDF report
@@ -156,7 +184,9 @@ def create_pdf_report(data):
     logo_path = "company_logo.png"  # Replace with the actual logo path
     p.drawImage(logo_path, 30, 750, width=100, height=50)
 
+    p.setFont("Helvetica-Bold", 16)
     p.drawString(150, 750, "Rick Ross Instagram Report")
+    p.setFont("Helvetica", 12)
     p.drawString(150, 735, "-----------------------------")
     
     # Report content
@@ -190,46 +220,77 @@ def create_pdf_report(data):
         "User Sentiment:",
         "Engagement Trends:",
         "Content Virality:",
+        "Audience Location:",
+        "Audience Age Range:",
+        "Content Format Preferences:",
+        "Influencer Marketing Interest:",
+        "Social Causes Support:",
     ]
     
     y_position = 720
     for content in report_content:
         if content == "Top Countries:":
             y_position -= 15
+            p.setFont("Helvetica-Bold", 12)
             p.drawString(150, y_position, content)
             top_countries = data["top_countries"]
             for country, value in top_countries.items():
                 y_position -= 15
+                p.setFont("Helvetica", 10)
                 p.drawString(150, y_position, f"{country}: {value}%")
             # Plot pie chart for top countries
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=(6, 4))
             ax.pie(list(top_countries.values()), labels=list(top_countries.keys()), autopct='%1.1f%%', startangle=90, colors=sns.color_palette("pastel"))
             ax.axis('equal')
+            plt.tight_layout()
+            pdf_pages = canvas.Canvas(buffer, pagesize=letter)
+            pdf_pages.setFont("Helvetica-Bold", 12)
+            pdf_pages.drawString(inch, 10 * inch, "Top Countries")
+            pdf_pages.setFont("Helvetica", 10)
+            pdf_pages.drawInlineImage(fig, inch, 8 * inch)
+            pdf_pages.showPage()
+            pdf_pages.save()
+            buffer.seek(0)
             st.pyplot(fig)
-        elif content in ["Age & Gender:", "Ethnicity:", "Languages:", "Audience Interests:", "Household Income:", "Education Level:", "Marital Status:", "Employment Status:", "Device Usage:", "Social Media Platforms:", "Content Preferences:", "Brand Engagement:", "Post Frequency:", "Content Themes:", "Sponsored Content:", "Influencer Collaborations:", "User Sentiment:", "Engagement Trends:", "Content Virality:"]:
+        elif content in ["Age & Gender:", "Ethnicity:", "Languages:", "Audience Interests:", "Household Income:", "Education Level:", "Marital Status:", "Employment Status:", "Device Usage:", "Social Media Platforms:", "Content Preferences:", "Brand Engagement:", "Post Frequency:", "Content Themes:", "Sponsored Content:", "Influencer Collaborations:", "User Sentiment:", "Engagement Trends:", "Content Virality:", "Audience Location:", "Audience Age Range:", "Content Format Preferences:", "Influencer Marketing Interest:", "Social Causes Support:"]:
             y_position -= 15
+            p.setFont("Helvetica-Bold", 12)
             p.drawString(150, y_position, content)
             metrics_data = data[content.split(':')[0].lower().replace(' ', '_')]
             df = pd.DataFrame.from_dict(metrics_data, orient='index', columns=['Percentage'])
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=(6, 4))
             ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Blues_d")
-            ax.set_xlabel(content.split(':')[0])
-            ax.set_ylabel('Percentage')
+            ax.set_xlabel(content.split(':')[0], fontsize=10)
+            ax.set_ylabel('Percentage', fontsize=10)
+            plt.tight_layout()
+            pdf_pages = canvas.Canvas(buffer, pagesize=letter)
+            pdf_pages.setFont("Helvetica-Bold", 12)
+            pdf_pages.drawString(inch, 10 * inch, content)
+            pdf_pages.setFont("Helvetica", 10)
+            pdf_pages.drawInlineImage(fig, inch, 8 * inch)
+            pdf_pages.showPage()
+            pdf_pages.save()
+            buffer.seek(0)
             st.pyplot(fig)
         elif content == "Estimated Reach:":
             y_position -= 15
+            p.setFont("Helvetica-Bold", 12)
             p.drawString(150, y_position, content)
             reach_data = data["estimated_reach"]
             for key, value in reach_data.items():
                 y_position -= 15
+                p.setFont("Helvetica", 10)
                 p.drawString(150, y_position, f"{key.capitalize()} Reach: {value[0]}M - {value[1]}M")
         elif content == "Estimated Impressions:":
             y_position -= 15
+            p.setFont("Helvetica-Bold", 12)
             p.drawString(150, y_position, content)
             impressions_data = data["estimated_impressions"]
+            p.setFont("Helvetica", 10)
             p.drawString(150, y_position - 15, f"Estimated Impressions: {impressions_data}M")
         else:
             y_position -= 15
+            p.setFont("Helvetica", 10)
             p.drawString(150, y_position, content.format(*[data[key] for key in content.split(':')[1].split()]))
     
     p.showPage()
@@ -271,6 +332,11 @@ sections = {
     "User Sentiment": "user_sentiment",
     "Engagement Trends": "engagement_trends",
     "Content Virality": "content_virality",
+    "Audience Location": "audience_location",
+    "Audience Age Range": "audience_age_range",
+    "Content Format Preferences": "content_format_preferences",
+    "Influencer Marketing Interest": "influencer_marketing_interest",
+    "Social Causes Support": "social_causes_support",
 }
 
 # Display sections
@@ -279,45 +345,10 @@ for section, data_key in sections.items():
     if section == "Top Countries":
         st.text("Top Countries")
         df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(8, 6))
         ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Greens_d")
-        ax.set_xlabel('Country')
-        ax.set_ylabel('Percentage')
+        ax.set_xlabel('Country', fontsize=12)
+        ax.set_ylabel('Percentage', fontsize=12)
+        plt.tight_layout()
         st.pyplot(fig)
-    elif section in ["Age & Gender", "Ethnicity", "Languages", "Audience Interests", "Household Income", "Education Level", "Marital Status", "Employment Status", "Device Usage", "Social Media Platforms", "Content Preferences", "Brand Engagement", "Post Frequency", "Content Themes", "Sponsored Content", "Influencer Collaborations", "User Sentiment", "Engagement Trends", "Content Virality"]:
-        df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
-        fig, ax = plt.subplots()
-        ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Reds_d")
-        ax.set_xlabel(section)
-        ax.set_ylabel('Percentage')
-        st.pyplot(fig)
-    elif section == "Estimated Reach":
-        reach_data = data[data_key]
-        fig, ax = plt.subplots()
-        reach_values = [f"{value[0]}M - {value[1]}M" for value in reach_data.values()]
-        ax.bar(reach_data.keys(), reach_values, color='orange')
-        ax.set_xlabel('Reach Type')
-        ax.set_ylabel('Reach Range')
-        st.pyplot(fig)
-    elif section == "Estimated Impressions":
-        st.text(f"Estimated Impressions: {data[data_key]}M")
-    else:
-        if isinstance(data[data_key], dict):
-            for key, value in data[data_key].items():
-                st.metric(key, value)
-        else:
-            st.metric(section, data[data_key])
-
-# Generate PDF report
-if st.button("Export Report as PDF"):
-    pdf_buffer = create_pdf_report(data)
-    st.download_button(
-        label="Download PDF Report",
-        data=pdf_buffer,
-        file_name="Digital_Metrics_Report.pdf",
-        mime="application/pdf"
-    )
-
-# Running the Streamlit App
-if __name__ == "__main__":
-    st.run()
+    elif section in ["Age & Gender", "Ethnicity", "Languages", "Audience Interests", "Household Income", "Education Level", "Marital Status", "Employment Status", "
