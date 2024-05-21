@@ -350,4 +350,42 @@ for section, data_key in sections.items():
         ax.set_ylabel('Percentage', fontsize=12)
         plt.tight_layout()
         st.pyplot(fig)
-    elif section in ["Age & Gender", "Ethnicity", "Languages", "Audience Interests", "Household Income", "Education Level", "Marital Status", "Employment Status", "
+    elif section in ["Age & Gender", "Ethnicity", "Languages", "Audience Interests", "Household Income", "Education Level", "Marital Status", "Employment Status", "Device Usage", "Social Media Platforms", "Content Preferences", "Brand Engagement", "Post Frequency", "Content Themes", "Sponsored Content", "Influencer Collaborations", "User Sentiment", "Engagement Trends", "Content Virality", "Audience Location", "Audience Age Range", "Content Format Preferences", "Influencer Marketing Interest", "Social Causes Support"]:
+        df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Blues_d")
+        ax.set_xlabel(section, fontsize=10)
+        ax.set_ylabel('Percentage', fontsize=10)
+        plt.tight_layout()
+        st.pyplot(fig)
+    elif section == "Estimated Reach":
+        reach_data = data[data_key]
+        fig, ax = plt.subplots(figsize=(6, 4))
+        reach_values = [f"{value[0]}M - {value[1]}M" for value in reach_data.values()]
+        ax.bar(reach_data.keys(), reach_values, color='orange')
+        ax.set_xlabel('Reach Type', fontsize=10)
+        ax.set_ylabel('Reach Range', fontsize=10)
+        plt.tight_layout()
+        st.pyplot(fig)
+    elif section == "Estimated Impressions":
+        st.text(f"Estimated Impressions: {data[data_key]}M")
+    else:
+        if isinstance(data[data_key], dict):
+            for key, value in data[data_key].items():
+                st.metric(key, value)
+        else:
+            st.metric(section, data[data_key])
+
+# Generate PDF report
+if st.button("Export Report as PDF"):
+    pdf_buffer = create_pdf_report(data)
+    st.download_button(
+        label="Download PDF Report",
+        data=pdf_buffer,
+        file_name="Digital_Metrics_Report.pdf",
+        mime="application/pdf"
+    )
+
+# Running the Streamlit App
+if __name__ == "__main__":
+    st.run()
