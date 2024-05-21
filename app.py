@@ -338,7 +338,6 @@ sections = {
     "Influencer Marketing Interest": "influencer_marketing_interest",
     "Social Causes Support": "social_causes_support",
 }
-
 # Display sections
 for section, data_key in sections.items():
     st.header(section)
