@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -164,11 +165,27 @@ for section, data_key in sections.items():
     st.header(section)
     if section == "Top Countries":
         st.text("Top Countries")
+        df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
+        fig, ax = plt.subplots()
+        ax = sns.barplot(x=df.index, y='Percentage', data=df)
+        ax.set_xlabel('Country')
+        ax.set_ylabel('Percentage')
+        st.pyplot(fig)
     elif section in ["Age & Gender", "Ethnicity", "Languages", "Audience Interests", "Household Income"]:
-        st.bar_chart(pd.DataFrame(data[data_key], index=[0]))
+        df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
+        fig, ax = plt.subplots()
+        ax = sns.barplot(x=df.index, y='Percentage', data=df)
+        ax.set_xlabel(section)
+        ax.set_ylabel('Percentage')
+        st.pyplot(fig)
     elif section == "Estimated Reach":
-        for key, value in data[data_key].items():
-            st.text(f"{key.capitalize()} Reach: {value[0]}M - {value[1]}M")
+        reach_data = data[data_key]
+        fig, ax = plt.subplots()
+        reach_values = [f"{value[0]}M - {value[1]}M" for value in reach_data.values()]
+        ax.bar(reach_data.keys(), reach_values)
+        ax.set_xlabel('Reach Type')
+        ax.set_ylabel('Reach Range')
+        st.pyplot(fig)
     elif section == "Estimated Impressions":
         st.text(f"Estimated Impressions: {data[data_key]}M")
     else:
