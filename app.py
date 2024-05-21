@@ -181,7 +181,7 @@ def create_pdf_report(data):
     p = canvas.Canvas(buffer, pagesize=letter)
     
     # Add Company Logo
-    logo_path = "company_logo.png"  # Replace with the actual logo path
+    logo_path = "sck.png"  # Replace with the actual logo path
     p.drawImage(logo_path, 30, 750, width=100, height=50)
 
     p.setFont("Helvetica-Bold", 16)
@@ -240,7 +240,7 @@ def create_pdf_report(data):
                 p.drawString(150, y_position, f"{country}: {value}%")
             # Plot pie chart for top countries
             fig, ax = plt.subplots(figsize=(6, 4))
-            ax.pie(list(top_countries.values()), labels=list(top_countries.keys()), autopct='%1.1f%%', startangle=90, colors=sns.color_palette("pastel"))
+            ax.pie(list(top_countries.values()), labels=list(top_countries.keys()), autopct='%1.1f%%', startangle=90, colors=sns.color_palette("Pastel1"))
             ax.axis('equal')
             plt.tight_layout()
             pdf_pages = canvas.Canvas(buffer, pagesize=letter)
@@ -259,7 +259,7 @@ def create_pdf_report(data):
             metrics_data = data[content.split(':')[0].lower().replace(' ', '_')]
             df = pd.DataFrame.from_dict(metrics_data, orient='index', columns=['Percentage'])
             fig, ax = plt.subplots(figsize=(6, 4))
-            ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Blues_d")
+            ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Pastel1")
             ax.set_xlabel(content.split(':')[0], fontsize=10)
             ax.set_ylabel('Percentage', fontsize=10)
             plt.tight_layout()
@@ -299,8 +299,21 @@ def create_pdf_report(data):
     return buffer
 
 # Streamlit App
+st.set_page_config(page_title="Digital Metrics Report", page_icon="sck.png", layout="wide", initial_sidebar_state="expanded")
+
+# Add logo to sidebar
+st.sidebar.image("sck.png", use_column_width=True)
+
 st.title("Digital Metrics Report for Investors")
 
+# Display sections
+for section, data_key in sections.items():
+    st.header(section)
+    if section == "Top Countries":
+        st.text("Top Countries")
+        df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Pastel1")
 # Sections
 sections = {
     "Followers": "followers",
