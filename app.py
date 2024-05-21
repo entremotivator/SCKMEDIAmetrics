@@ -51,7 +51,7 @@ data = {
         "Fashion": 31.0,
         "Social Issues": 22.0,
         "Beauty": 23.0,
-        "Sports": 60.0,  # New metric
+        "Sports": 60.0,
     },
     "household_income": {
         "$0K—5K": 8.9,
@@ -63,6 +63,87 @@ data = {
         "$100K—150K": 13.0,
         "$150K—200K": 7.1,
         "$200K+": 8.4,
+    },
+    "education_level": {
+        "High School or Less": 25.6,
+        "Some College": 32.4,
+        "Bachelor's Degree": 27.8,
+        "Graduate Degree": 14.2,
+    },
+    "marital_status": {
+        "Single": 48.7,
+        "Married": 36.5,
+        "Divorced": 9.2,
+        "Widowed": 5.6,
+    },
+    "employment_status": {
+        "Employed": 62.3,
+        "Unemployed": 12.7,
+        "Student": 15.4,
+        "Retired": 9.6,
+    },
+    "device_usage": {
+        "Mobile": 78.4,
+        "Desktop": 16.2,
+        "Tablet": 5.4,
+    },
+    "social_media_platforms": {
+        "Instagram": 100.0,
+        "Facebook": 72.6,
+        "Twitter": 48.9,
+        "TikTok": 36.7,
+        "Snapchat": 24.5,
+    },
+    "content_preferences": {
+        "Videos": 85.2,
+        "Photos": 72.4,
+        "Stories": 61.8,
+        "Live Streams": 38.6,
+        "Reels": 27.4,
+    },
+    "brand_engagement": {
+        "Likes": 72.8,
+        "Comments": 48.6,
+        "Shares": 32.4,
+        "Saves": 19.2,
+    },
+    "post_frequency": {
+        "Daily": 25.6,
+        "2-3 Times a Week": 38.4,
+        "Once a Week": 22.8,
+        "Less Than Once a Week": 13.2,
+    },
+    "content_themes": {
+        "Lifestyle": 68.4,
+        "Comedy": 62.2,
+        "Music": 54.8,
+        "Fashion": 42.6,
+        "Travel": 38.2,
+        "Food": 32.8,
+        "Fitness": 28.4,
+    },
+    "sponsored_content": {
+        "Interested": 62.8,
+        "Not Interested": 37.2,
+    },
+    "influencer_collaborations": {
+        "Interested": 74.6,
+        "Not Interested": 25.4,
+    },
+    "user_sentiment": {
+        "Positive": 82.4,
+        "Neutral": 14.2,
+        "Negative": 3.4,
+    },
+    "engagement_trends": {
+        "Increasing": 48.6,
+        "Stable": 32.8,
+        "Decreasing": 18.6,
+    },
+    "content_virality": {
+        "High": 22.4,
+        "Medium": 54.2,
+        "Low": 23.4,
     },
 }
 
@@ -94,7 +175,21 @@ def create_pdf_report(data):
         "Audience Interests:",
         "Household Income:",
         "Estimated Reach:",
-        "Estimated Impressions:"
+        "Estimated Impressions:",
+        "Education Level:",
+        "Marital Status:",
+        "Employment Status:",
+        "Device Usage:",
+        "Social Media Platforms:",
+        "Content Preferences:",
+        "Brand Engagement:",
+        "Post Frequency:",
+        "Content Themes:",
+        "Sponsored Content:",
+        "Influencer Collaborations:",
+        "User Sentiment:",
+        "Engagement Trends:",
+        "Content Virality:",
     ]
     
     y_position = 720
@@ -108,15 +203,19 @@ def create_pdf_report(data):
                 p.drawString(150, y_position, f"{country}: {value}%")
             # Plot pie chart for top countries
             fig, ax = plt.subplots()
-            ax.pie(list(top_countries.values()), labels=list(top_countries.keys()), autopct='%1.1f%%', startangle=90)
+            ax.pie(list(top_countries.values()), labels=list(top_countries.keys()), autopct='%1.1f%%', startangle=90, colors=sns.color_palette("pastel"))
             ax.axis('equal')
             st.pyplot(fig)
-        elif content in ["Age & Gender:", "Ethnicity:", "Languages:", "Audience Interests:", "Household Income:"]:
+        elif content in ["Age & Gender:", "Ethnicity:", "Languages:", "Audience Interests:", "Household Income:", "Education Level:", "Marital Status:", "Employment Status:", "Device Usage:", "Social Media Platforms:", "Content Preferences:", "Brand Engagement:", "Post Frequency:", "Content Themes:", "Sponsored Content:", "Influencer Collaborations:", "User Sentiment:", "Engagement Trends:", "Content Virality:"]:
             y_position -= 15
             p.drawString(150, y_position, content)
             metrics_data = data[content.split(':')[0].lower().replace(' ', '_')]
-            df = pd.DataFrame(metrics_data, index=[0])
-            st.bar_chart(df)
+            df = pd.DataFrame.from_dict(metrics_data, orient='index', columns=['Percentage'])
+            fig, ax = plt.subplots()
+            ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Blues_d")
+            ax.set_xlabel(content.split(':')[0])
+            ax.set_ylabel('Percentage')
+            st.pyplot(fig)
         elif content == "Estimated Reach:":
             y_position -= 15
             p.drawString(150, y_position, content)
@@ -157,7 +256,21 @@ sections = {
     "Estimated Reach": "estimated_reach",
     "Estimated Impressions": "estimated_impressions",
     "Audience Interests": "audience_interests",
-    "Household Income": "household_income"
+    "Household Income": "household_income",
+    "Education Level": "education_level",
+    "Marital Status": "marital_status",
+    "Employment Status": "employment_status",
+    "Device Usage": "device_usage",
+    "Social Media Platforms": "social_media_platforms",
+    "Content Preferences": "content_preferences",
+    "Brand Engagement": "brand_engagement",
+    "Post Frequency": "post_frequency",
+    "Content Themes": "content_themes",
+    "Sponsored Content": "sponsored_content",
+    "Influencer Collaborations": "influencer_collaborations",
+    "User Sentiment": "user_sentiment",
+    "Engagement Trends": "engagement_trends",
+    "Content Virality": "content_virality",
 }
 
 # Display sections
@@ -167,14 +280,14 @@ for section, data_key in sections.items():
         st.text("Top Countries")
         df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
         fig, ax = plt.subplots()
-        ax = sns.barplot(x=df.index, y='Percentage', data=df)
+        ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Greens_d")
         ax.set_xlabel('Country')
         ax.set_ylabel('Percentage')
         st.pyplot(fig)
-    elif section in ["Age & Gender", "Ethnicity", "Languages", "Audience Interests", "Household Income"]:
+    elif section in ["Age & Gender", "Ethnicity", "Languages", "Audience Interests", "Household Income", "Education Level", "Marital Status", "Employment Status", "Device Usage", "Social Media Platforms", "Content Preferences", "Brand Engagement", "Post Frequency", "Content Themes", "Sponsored Content", "Influencer Collaborations", "User Sentiment", "Engagement Trends", "Content Virality"]:
         df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
         fig, ax = plt.subplots()
-        ax = sns.barplot(x=df.index, y='Percentage', data=df)
+        ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Reds_d")
         ax.set_xlabel(section)
         ax.set_ylabel('Percentage')
         st.pyplot(fig)
@@ -182,7 +295,7 @@ for section, data_key in sections.items():
         reach_data = data[data_key]
         fig, ax = plt.subplots()
         reach_values = [f"{value[0]}M - {value[1]}M" for value in reach_data.values()]
-        ax.bar(reach_data.keys(), reach_values)
+        ax.bar(reach_data.keys(), reach_values, color='orange')
         ax.set_xlabel('Reach Type')
         ax.set_ylabel('Reach Range')
         st.pyplot(fig)
