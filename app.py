@@ -283,7 +283,7 @@ st.set_page_config(page_title="Digital Metrics Report", page_icon="sck.png", lay
 # Add logo to sidebar
 st.sidebar.image("sck.png", use_column_width=True)
 
-st.title("Digital Metrics Report for Investors")
+st.title("SCK media Metrics Report")
 
 # Display sections
 
