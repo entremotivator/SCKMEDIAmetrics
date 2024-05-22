@@ -185,7 +185,7 @@ def create_pdf_report(data):
     p.drawImage(logo_path, 30, 750, width=100, height=50)
 
     p.setFont("Helvetica-Bold", 16)
-    p.drawString(150, 750, "Rick Ross Instagram Report")
+    p.drawString(150, 750, "SCK media Metrics Report")
     p.setFont("Helvetica", 12)
     p.drawString(150, 735, "-----------------------------")
 
