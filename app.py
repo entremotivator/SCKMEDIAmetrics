@@ -171,38 +171,38 @@ def create_pdf_report(data):
     # Add Company Description
     p.setFont("Helvetica", 10)
     p.drawString(
-        150,
+        30,
         720,
         "SCK MEDIA TV IS AN INNOVATIVE GLOBAL PAY-PER-VIEW (PPV) PLATFORM DEDICATED TO SOCIAL CONTENT CREATORS,",
     )
     p.drawString(
-        150,
+        30,
         705,
         "ALLOWING CONTENT CREATORS TO MONETIZE THEIR 'eSCKlusive' CONTENT ON THEIR OWN TERMS.",
     )
-    p.drawString(150, 690, "DO YOU CREATE CONTENT 'eSCKlusive' ENOUGH FOR PAY-PER-VIEW?")
+    p.drawString(30, 690, "DO YOU CREATE CONTENT 'eSCKlusive' ENOUGH FOR PAY-PER-VIEW?")
     p.drawString(
-        150,
+        30,
         675,
         "DO YOU HAVE AN ACTIVE SOCIAL MEDIA FOLLOWING, TRENDING CONTENT OR MONETIZABLE CONCEPTS?",
     )
     p.drawString(
-        150,
+        30,
         660,
         "ARE YOU READY TO BE YOUR OWN SOCIAL CONTENT CHANNEL, OWN YOUR CONTENT & RECEIVE THE LION'S SHARE OF YOUR CONTENT'S ENGAGEMENT, ADVERTISING & RESIDUAL REVENUE?",
     )
 
     # Report content
     report_content = [
-        "Total Followers: {0}M",
-        "Quality Audience: {1}M",
-        "Followers Growth: {2}%",
-        "Engagement Rate: {3}%",
-        "Authentic Engagement per Post: {4}K",
-        "Most Recent Post: {5}",
-        "Global Rank: {6}",
-        "Monthly Subscribers: {7}K",
-        "PPV Subscriptions: {8}M",
+        "Total Followers: {0}M".format(data['followers'] / 1e6),
+        "Quality Audience: {0}M".format(data['quality_audience']),
+        "Followers Growth: {0}%".format(data['followers_growth']),
+        "Engagement Rate: {0}%".format(data['engagement_rate']),
+        "Authentic Engagement per Post: {0}K".format(data['authentic_engagement']),
+        "Most Recent Post: {0}".format(data['most_recent_post']),
+        "Global Rank: {0}".format(data['global_rank']),
+        "Monthly Subscribers: {0}K".format(data['monthly_subscribers'] / 1e3),
+        "PPV Subscriptions: {0}M".format(data['ppv_subscriptions']),
         "Top Countries:",
         "Age & Gender:",
         "Ethnicity:",
@@ -234,15 +234,15 @@ def create_pdf_report(data):
 
     # Format the report content with the actual data
     formatted_content = [
-        report_content[0].format(data['followers'] / 1e6),
-        report_content[1].format(data['quality_audience']),
-        report_content[2].format(data['followers_growth']),
-        report_content[3].format(data['engagement_rate']),
-        report_content[4].format(data['authentic_engagement']),
-        report_content[5].format(data['most_recent_post']),
-        report_content[6].format(data['global_rank']),
-        report_content[7].format(data['monthly_subscribers'] / 1e3),
-        report_content[8].format(data['ppv_subscriptions']),
+        report_content[0],
+        report_content[1],
+        report_content[2],
+        report_content[3],
+        report_content[4],
+        report_content[5],
+        report_content[6],
+        report_content[7],
+        report_content[8],
         report_content[9],
         report_content[10],
         report_content[11],
@@ -294,4 +294,3 @@ st.download_button(
     file_name="SCK_Media_Metrics_Report.pdf",
     mime="application/pdf"
 )
-
