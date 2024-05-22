@@ -160,7 +160,7 @@ def create_pdf_report(data):
     p = canvas.Canvas(buffer, pagesize=letter)
 
     # Add Company Logo
-    logo_path = "sck_logo.png"  # Replace with the actual logo path
+    logo_path = "sck.png"  # Replace with the actual logo path
     p.drawImage(logo_path, 30, 750, width=100, height=50)
 
     p.setFont("Helvetica-Bold", 16)
