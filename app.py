@@ -153,7 +153,8 @@ data = {
     },
     "monthly_subscribers": 22000,
     "ppv_subscriptions": 2.2,
-    },
+}
+
 def create_pdf_report(data):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
@@ -188,7 +189,7 @@ def create_pdf_report(data):
     p.drawString(
         150,
         660,
-        "ARE YOU READY TO BE YOUR OWN SOCIAL CONTENT CHANNEL, OWN YOUR CONTENT & RECEIVE THE LIONS SHARE OF YOUR CONTENT'S ENGAGEMENT, ADVERTISING & RESIDUAL REVENUE?",
+        "ARE YOU READY TO BE YOUR OWN SOCIAL CONTENT CHANNEL, OWN YOUR CONTENT & RECEIVE THE LION'S SHARE OF YOUR CONTENT'S ENGAGEMENT, ADVERTISING & RESIDUAL REVENUE?",
     )
 
     # Report content
@@ -231,182 +232,66 @@ def create_pdf_report(data):
         "Social Causes Support:",
     ]
 
-    y_position = 630
-    for content in report_content:
-        if content == "Top Countries:":
-            y_position -= 15
+    # Format the report content with the actual data
+    formatted_content = [
+        report_content[0].format(data['followers'] / 1e6),
+        report_content[1].format(data['quality_audience']),
+        report_content[2].format(data['followers_growth']),
+        report_content[3].format(data['engagement_rate']),
+        report_content[4].format(data['authentic_engagement']),
+        report_content[5].format(data['most_recent_post']),
+        report_content[6].format(data['global_rank']),
+        report_content[7].format(data['monthly_subscribers'] / 1e3),
+        report_content[8].format(data['ppv_subscriptions']),
+        report_content[9],
+        report_content[10],
+        report_content[11],
+        report_content[12],
+        report_content[13],
+        report_content[14],
+        report_content[15],
+        report_content[16],
+        report_content[17],
+        report_content[18],
+        report_content[19],
+        report_content[20],
+        report_content[21],
+        report_content[22],
+        report_content[23],
+        report_content[24],
+        report_content[25],
+        report_content[26],
+        report_content[27],
+        report_content[28],
+        report_content[29],
+        report_content[30],
+        report_content[31],
+        report_content[32],
+        report_content[33],
+        report_content[34],
+        report_content[35],
+    ]
+
+    y_position = 640
+    for line in formatted_content:
+        if line.endswith(":"):
             p.setFont("Helvetica-Bold", 12)
-            p.drawString(150, y_position, content)
-            top_countries = data["top_countries"]
-            for country, value in top_countries.items():
-                y_position -= 15
-                p.setFont("Helvetica", 10)
-                p.drawString(150, y_position, f"{country}: {value}%")
-        elif content in [
-            "Age & Gender:",
-            "Ethnicity:",
-            "Languages:",
-            "Audience Interests:",
-            "Household Income:",
-            "Education Level:",
-            "Marital Status:",
-            "Employment Status:",
-            "Device Usage:",
-            "Social Media Platforms:",
-            "Content Preferences:",
-            "Brand Engagement:",
-            "Post Frequency:",
-            "Content Themes:",
-            "Sponsored Content:",
-            "Influencer Collaborations:",
-            "User Sentiment:",
-            "Engagement Trends:",
-            "Content Virality:",
-            "Audience Location:",
-            "Audience Age Range:",
-            "Content Format Preferences:",
-            "Influencer Marketing Interest:",
-            "Social Causes Support:",
-        ]:
-            y_position -= 15
-            p.setFont("Helvetica-Bold", 12)
-            p.drawString(150, y_position, content)
-            y_position -= 15
-            p.setFont("Helvetica", 10)
-            key = content.lower().replace(" & ", "_").replace(" ", "_").replace(":", "")
-            if key in data:
-                for sub_key, value in data[key].items():
-                    p.drawString(150, y_position, f"{sub_key}: {value}%")
-                    y_position -= 15
-        elif content == "Estimated Reach:":
-            y_position -= 15
-            p.setFont("Helvetica-Bold", 12)
-            p.drawString(150, y_position, content)
-            y_position -= 15
-            p.setFont("Helvetica", 10)
-            p.drawString(150, y_position, f"Post: {data['estimated_reach']['post']}")
-            y_position -= 15
-            p.drawString(150, y_position, f"Story: {data['estimated_reach']['story']}")
-        elif content == "Estimated Impressions:":
-            y_position -= 15
-            p.setFont("Helvetica", 12)
-            p.drawString(
-                150,
-                y_position,
-                f"Estimated Impressions: {data['estimated_impressions']}M",
-            )
         else:
-            y_position -= 15
-            p.setFont("Helvetica", 12)
-            key = content.lower().replace(" ", "_").replace(":", "")
-            if key in data:
-                value = data[key]
-                p.drawString(
-                    150,
-                    y_position,
-                    content.format(*[round(v, 2) for v in (data[key],)] if isinstance(value, (float, int)) else data[key]),
-                )
+            p.setFont("Helvetica", 10)
+        p.drawString(30, y_position, line)
+        y_position -= 15
 
-        if y_position < 50:
-            # Add a new page if content goes beyond page length
-            p.showPage()
-            y_position = 750
-
-    p.setFont("Helvetica", 12)
+    p.showPage()
     p.save()
     buffer.seek(0)
     return buffer
 
-# Streamlit App
-st.title("SCK Media Metrics Report")
-
-# Add Company Logo
-st.image("sck.png", width=200)  # Replace with the actual logo path
-
-# Add Company Description
-st.write(
-    "SCK MEDIA TV IS AN INNOVATIVE GLOBAL PAY-PER-VIEW (PPV) PLATFORM DEDICATED TO SOCIAL CONTENT CREATORS,"
-)
-st.write("ALLOWING CONTENT CREATORS TO MONETIZE THEIR 'eSCKlusive' CONTENT ON THEIR OWN TERMS.")
-st.write("DO YOU CREATE CONTENT 'eSCKlusive' ENOUGH FOR PAY-PER-VIEW?")
-st.write(
-    "DO YOU HAVE AN ACTIVE SOCIAL MEDIA FOLLOWING, TRENDING CONTENT OR MONETIZABLE CONCEPTS?"
-)
-st.write(
-    "ARE YOU READY TO BE YOUR OWN SOCIAL CONTENT CHANNEL, OWN YOUR CONTENT & RECEIVE THE LIONS SHARE OF YOUR CONTENT'S ENGAGEMENT, ADVERTISING & RESIDUAL REVENUE?"
+# PDF Report
+buffer = create_pdf_report(data)
+st.download_button(
+    label="Download PDF Report",
+    data=buffer,
+    file_name="SCK_Media_Metrics_Report.pdf",
+    mime="application/pdf"
 )
 
-# Display Data
-st.subheader("Overall Metrics")
-st.write(f"**Total Followers:** {data['followers']:.2f}M")
-st.write(f"**Quality Audience:** {data['quality_audience']}M")
-st.write(f"**Followers Growth:** {data['followers_growth']}%")
-st.write(f"**Engagement Rate:** {data['engagement_rate']}%")
-st.write(f"**Authentic Engagement per Post:** {data['authentic_engagement']}K")
-st.write(f"**Most Recent Post:** {data['most_recent_post']}")
-st.write(f"**Global Rank:** {data['global_rank']}")
-st.write(f"**Monthly Subscribers:** {data['monthly_subscribers']}K")
-st.write(f"**PPV Subscriptions:** {data['ppv_subscriptions']}M")
-
-# Country Rank
-st.subheader("Country Rank")
-for country, rank in data['country_rank'].items():
-    st.write(f"**{country} Rank:** {rank}")
-
-# Top Countries
-st.subheader("Top Countries")
-top_countries = pd.DataFrame(list(data['top_countries'].items()), columns=['Country', 'Percentage'])
-fig, ax = plt.subplots()
-sns.barplot(x='Percentage', y='Country', data=top_countries, ax=ax)
-ax.set_title('Top Countries by Audience Percentage')
-st.pyplot(fig)
-
-# Age & Gender Distribution
-st.subheader("Age & Gender Distribution")
-age_gender = pd.DataFrame(list(data['age_gender'].items()), columns=['Gender', 'Percentage'])
-fig, ax = plt.subplots()
-sns.barplot(x='Percentage', y='Gender', data=age_gender, ax=ax)
-ax.set_title('Age & Gender Distribution')
-st.pyplot(fig)
-
-# Ethnicity Distribution
-st.subheader("Ethnicity Distribution")
-ethnicity = pd.DataFrame(list(data['ethnicity'].items()), columns=['Ethnicity', 'Percentage'])
-fig, ax = plt.subplots()
-sns.barplot(x='Percentage', y='Ethnicity', data=ethnicity, ax=ax)
-ax.set_title('Ethnicity Distribution')
-st.pyplot(fig)
-
-# Languages Spoken
-st.subheader("Languages Spoken")
-languages = pd.DataFrame(list(data['languages'].items()), columns=['Language', 'Percentage'])
-fig, ax = plt.subplots()
-sns.barplot(x='Percentage', y='Language', data=languages, ax=ax)
-ax.set_title('Languages Spoken')
-st.pyplot(fig)
-
-# Audience Interests
-st.subheader("Audience Interests")
-audience_interests = pd.DataFrame(list(data['audience_interests'].items()), columns=['Interest', 'Percentage'])
-fig, ax = plt.subplots()
-sns.barplot(x='Percentage', y='Interest', data=audience_interests, ax=ax)
-ax.set_title('Audience Interests')
-st.pyplot(fig)
-
-# Household Income
-st.subheader("Household Income")
-household_income = pd.DataFrame(list(data['household_income'].items()), columns=['Income Range', 'Percentage'])
-fig, ax = plt.subplots()
-sns.barplot(x='Percentage', y='Income Range', data=household_income, ax=ax)
-ax.set_title('Household Income')
-st.pyplot(fig)
-
-# Download PDF Report
-if st.button("Download PDF Report"):
-    pdf_buffer = create_pdf_report(data)
-    st.download_button(
-        label="Download Report as PDF",
-        data=pdf_buffer,
-        file_name="SCK_Media_Metrics_Report.pdf",
-        mime="application/pdf"
-    )
