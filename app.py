@@ -1,4 +1,4 @@
-import streamlit as st
+aimport streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -283,7 +283,7 @@ st.set_page_config(page_title="Digital Metrics Report", page_icon="sck.png", lay
 # Add logo to sidebar
 st.sidebar.image("sck.png", use_column_width=True)
 
-st.title("SCK media Metrics Report")
+st.title("SCK Media Metrics Report")
 
 # Display sections
 
