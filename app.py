@@ -178,6 +178,8 @@ data = {
 }
 
 # Function to create a PDF report
+def create_pdf_report
+
 def create_pdf_report(data):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
