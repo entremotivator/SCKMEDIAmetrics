@@ -9,7 +9,7 @@ from reportlab.lib.units import inch
 
 # Sample Data
 data = {
-    "followers": 1500000.05,
+    "followers": 19.5,
     "quality_audience": 12.4,
     "followers_growth": 0.39,
     "engagement_rate": 1.36,
@@ -83,7 +83,11 @@ data = {
         "Student": 15.4,
         "Retired": 9.6,
     },
-    "device_usage": {"Mobile": 78.4, "Desktop": 16.2, "Tablet": 5.4},
+    "device_usage": {
+        "Mobile": 78.4,
+        "Desktop": 16.2,
+        "Tablet": 5.4,
+    },
     "social_media_platforms": {
         "Instagram": 100.0,
         "Facebook": 72.6,
@@ -119,16 +123,34 @@ data = {
         "Food": 32.8,
         "Fitness": 28.4,
     },
-    "sponsored_content": {"Interested": 62.8, "Not Interested": 37.2},
-    "influencer_collaborations": {"Interested": 74.6, "Not Interested": 25.4},
-    "user_sentiment": {"Positive": 82.4, "Neutral": 14.2, "Negative": 3.4},
+    "sponsored_content": {
+        "Interested": 62.8,
+        "Not Interested": 37.2,
+    },
+    "influencer_collaborations": {
+        "Interested": 74.6,
+        "Not Interested": 25.4,
+    },
+    "user_sentiment": {
+        "Positive": 82.4,
+        "Neutral": 14.2,
+        "Negative": 3.4,
+    },
     "engagement_trends": {
         "Increasing": 48.6,
         "Stable": 32.8,
         "Decreasing": 18.6,
     },
-    "content_virality": {"High": 22.4, "Medium": 54.2, "Low": 23.4},
-    "audience_location": {"Urban": 62.8, "Suburban": 24.6, "Rural": 12.6},
+    "content_virality": {
+        "High": 22.4,
+        "Medium": 54.2,
+        "Low": 23.4,
+    },
+    "audience_location": {
+        "Urban": 62.8,
+        "Suburban": 24.6,
+        "Rural": 12.6,
+    },
     "audience_age_range": {
         "18-24": 28.4,
         "25-34": 36.2,
@@ -151,8 +173,6 @@ data = {
         "Education": 28.2,
         "Health": 24.6,
     },
-    "monthly_subscribers": 22000,
-    "ppv_subscriptions": 2.2,
 }
 
 # Function to create a PDF report
@@ -164,26 +184,10 @@ def create_pdf_report(data):
     logo_path = "sck.png"  # Replace with the actual logo path
     p.drawImage(logo_path, 30, 750, width=100, height=50)
 
-    # Add Title
     p.setFont("Helvetica-Bold", 16)
-    p.drawString(150, 750, "SCK Media Metrics Report")
+    p.drawString(150, 750, "Rick Ross Instagram Report")
     p.setFont("Helvetica", 12)
     p.drawString(150, 735, "-----------------------------")
-
-    # Add Company Description
-    p.setFont("Helvetica", 10)
-    description = [
-        "SCK MEDIA TV IS AN INNOVATIVE GLOBAL PAY-PER-VIEW (PPV) PLATFORM DEDICATED TO SOCIAL CONTENT CREATORS,",
-        "ALLOWING CONTENT CREATORS TO MONETIZE THEIR 'eSCKlusive' CONTENT ON THEIR OWN TERMS.",
-        "DO YOU CREATE CONTENT 'eSCKlusive' ENOUGH FOR PAY-PER-VIEW?",
-        "DO YOU HAVE AN ACTIVE SOCIAL MEDIA FOLLOWING, TRENDING CONTENT OR MONETIZABLE CONCEPTS?",
-        "ARE YOU READY TO BE YOUR OWN SOCIAL CONTENT CHANNEL, OWN YOUR CONTENT & RECEIVE THE LIONS SHARE OF YOUR",
-        "CONTENT'S ENGAGEMENT, ADVERTISING & RESIDUAL REVENUE?"
-    ]
-    y_position = 720
-    for line in description:
-        p.drawString(150, y_position, line)
-        y_position -= 15
 
     # Report content
     report_content = [
@@ -194,16 +198,14 @@ def create_pdf_report(data):
         "Authentic Engagement per Post: {4}K",
         "Most Recent Post: {5}",
         "Global Rank: {6}",
-        "Monthly Subscribers: {7}K",
-        "PPV Subscriptions: {8}M",
-    ]
-    report_content.extend([
         "Top Countries:",
         "Age & Gender:",
         "Ethnicity:",
         "Languages:",
         "Audience Interests:",
         "Household Income:",
+        "Estimated Reach:",
+        "Estimated Impressions:",
         "Education Level:",
         "Marital Status:",
         "Employment Status:",
@@ -213,8 +215,8 @@ def create_pdf_report(data):
         "Brand Engagement:",
         "Post Frequency:",
         "Content Themes:",
-        "Sponsored Content Interest:",
-        "Influencer Collaborations Interest:",
+        "Sponsored Content:",
+        "Influencer Collaborations:",
         "User Sentiment:",
         "Engagement Trends:",
         "Content Virality:",
@@ -222,184 +224,155 @@ def create_pdf_report(data):
         "Audience Age Range:",
         "Content Format Preferences:",
         "Influencer Marketing Interest:",
-        "Support for Social Causes:",
-    ])
-
-    # Formatting the data
-    formatted_data = {
-        "Total Followers": f"{data['followers'] / 1e6:.2f}M",
-        "Quality Audience": f"{data['quality_audience']}M",
-        "Followers Growth": f"{data['followers_growth']}%",
-        "Engagement Rate": f"{data['engagement_rate']}%",
-        "Authentic Engagement per Post": f"{data['authentic_engagement']}K",
-        "Most Recent Post": data["most_recent_post"],
-        "Global Rank": data["global_rank"],
-        "Monthly Subscribers": f"{data['monthly_subscribers'] / 1e3:.1f}K",
-        "PPV Subscriptions": f"{data['ppv_subscriptions'] / 1e6:.1f}M",
-    }
-
-    # Populate the PDF with the formatted data
-    y_position = 600
-    p.setFont("Helvetica", 10)
-    for item in report_content[:9]:
-        key = item.split(":")[0].strip()
-        value = formatted_data.get(key, "N/A")
-        p.drawString(30, y_position, item.format(value))
-        y_position -= 15
-
-    # Add multi-line sections
-    multi_line_sections = [
-        ("Top Countries", data["top_countries"]),
-        ("Age & Gender", data["age_gender"]),
-        ("Ethnicity", data["ethnicity"]),
-        ("Languages", data["languages"]),
-        ("Audience Interests", data["audience_interests"]),
-        ("Household Income", data["household_income"]),
-        ("Education Level", data["education_level"]),
-        ("Marital Status", data["marital_status"]),
-        ("Employment Status", data["employment_status"]),
-        ("Device Usage", data["device_usage"]),
-        ("Social Media Platforms", data["social_media_platforms"]),
-        ("Content Preferences", data["content_preferences"]),
-        ("Brand Engagement", data["brand_engagement"]),
-        ("Post Frequency", data["post_frequency"]),
-        ("Content Themes", data["content_themes"]),
-        ("Sponsored Content Interest", data["sponsored_content"]),
-        ("Influencer Collaborations Interest", data["influencer_collaborations"]),
-        ("User Sentiment", data["user_sentiment"]),
-        ("Engagement Trends", data["engagement_trends"]),
-        ("Content Virality", data["content_virality"]),
-        ("Audience Location", data["audience_location"]),
-        ("Audience Age Range", data["audience_age_range"]),
-        ("Content Format Preferences", data["content_format_preferences"]),
-        ("Influencer Marketing Interest", data["influencer_marketing_interest"]),
-        ("Support for Social Causes", data["social_causes_support"]),
+        "Social Causes Support:",
     ]
 
-    for section, details in multi_line_sections:
-        if y_position < 100:
-            p.showPage()
-            y_position = 750
-        p.drawString(30, y_position, section + ":")
-        y_position -= 15
-        for sub_item, sub_value in details.items():
-            p.drawString(50, y_position, f"{sub_item}: {sub_value}")
+    y_position = 720
+    for content in report_content:
+        if content == "Top Countries:":
             y_position -= 15
+            p.setFont("Helvetica-Bold", 12)
+            p.drawString(150, y_position, content)
+            top_countries = data["top_countries"]
+            for country, value in top_countries.items():
+                y_position -= 15
+                p.setFont("Helvetica", 10)
+                p.drawString(150, y_position, f"{country}: {value}%")
+        elif content in ["Age & Gender:", "Ethnicity:", "Languages:", "Audience Interests:", "Household Income:", "Education Level:", "Marital Status:", "Employment Status:", "Device Usage:", "Social Media Platforms:", "Content Preferences:", "Brand Engagement:", "Post Frequency:", "Content Themes:", "Sponsored Content:", "Influencer Collaborations:", "User Sentiment:", "Engagement Trends:", "Content Virality:", "Audience Location:", "Audience Age Range:", "Content Format Preferences:", "Influencer Marketing Interest:", "Social Causes Support:"]:
+            y_position -= 15
+            p.setFont("Helvetica-Bold", 12)
+            p.drawString(150, y_position, content)
+            metrics_data = data[content.split(':')[0].lower().replace(' ', '_')]
+            df = pd.DataFrame.from_dict(metrics_data, orient='index', columns=['Percentage'])
+            fig, ax = plt.subplots(figsize=(6, 4))
+            ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Blues_d")
+            ax.set_xlabel(content.split(':')[0], fontsize=10)
+            ax.set_ylabel('Percentage', fontsize=10)
+            plt.tight_layout()
+            plt.savefig("temp_plot.png", format="png", bbox_inches="tight")
+            p.drawInlineImage("temp_plot.png", inch, y_position - 15, width=400, height=300)
+        elif content == "Estimated Reach:":
+            y_position -= 15
+            p.setFont("Helvetica-Bold", 12)
+            p.drawString(150, y_position, content)
+            reach_data = data["estimated_reach"]
+            for key, value in reach_data.items():
+                y_position -= 15
+                p.setFont("Helvetica", 10)
+                p.drawString(150, y_position, f"{key.capitalize()} Reach: {value[0]}M - {value[1]}M")
+        elif content == "Estimated Impressions:":
+            y_position -= 15
+            p.setFont("Helvetica-Bold", 12)
+            p.drawString(150, y_position, content)
+            impressions_data = data["estimated_impressions"]
+            p.setFont("Helvetica", 10)
+            p.drawString(150, y_position - 15, f"Estimated Impressions: {impressions_data}M")
+        else:
+            y_position -= 15
+            p.setFont("Helvetica", 10)
+            p.drawString(150, y_position, content.format(*[data[key] for key in content.split(':')[1].split()]))
 
-    # Save PDF to buffer
+    p.showPage()
     p.save()
     buffer.seek(0)
     return buffer
 
 # Streamlit App
-st.title("SCK Media Metrics Report")
+st.set_page_config(page_title="Digital Metrics Report", page_icon="sck.png", layout="wide", initial_sidebar_state="expanded")
 
-# Formatted Data for Display
-formatted_data_display = {
-    "Total Followers": f"{data['followers'] / 1e6:.2f}M",
-    "Quality Audience": f"{data['quality_audience']}M",
-    "Followers Growth": f"{data['followers_growth']}%",
-    "Engagement Rate": f"{data['engagement_rate']}%",
-    "Authentic Engagement per Post": f"{data['authentic_engagement']}K",
-    "Most Recent Post": data["most_recent_post"],
-    "Global Rank": data["global_rank"],
-    "Monthly Subscribers": f"{data['monthly_subscribers'] / 1e3:.1f}K",
-    "PPV Subscriptions": f"{data['ppv_subscriptions'] / 1e6:.1f}M",
+# Add logo to sidebar
+st.sidebar.image("sck.png", use_column_width=True)
+
+st.title("Digital Metrics Report for Investors")
+
+# Display sections
+
+# Sections
+sections = {
+    "Followers": "followers",
+    "Quality Audience": "quality_audience",
+    "Followers Growth": "followers_growth",
+    "Engagement Rate": "engagement_rate",
+    "Authentic Engagement": "authentic_engagement",
+    "Most Recent Post": "most_recent_post",
+    "Global and Country Rank": "global_rank",
+    "Top Countries": "top_countries",
+    "Age & Gender": "age_gender",
+    "Ethnicity": "ethnicity",
+    "Languages": "languages",
+    "Estimated Reach": "estimated_reach",
+    "Estimated Impressions": "estimated_impressions",
+    "Audience Interests": "audience_interests",
+    "Household Income": "household_income",
+    "Education Level": "education_level",
+    "Marital Status": "marital_status",
+    "Employment Status": "employment_status",
+    "Device Usage": "device_usage",
+    "Social Media Platforms": "social_media_platforms",
+    "Content Preferences": "content_preferences",
+    "Brand Engagement": "brand_engagement",
+    "Post Frequency": "post_frequency",
+    "Content Themes": "content_themes",
+    "Sponsored Content": "sponsored_content",
+    "Influencer Collaborations": "influencer_collaborations",
+    "User Sentiment": "user_sentiment",
+    "Engagement Trends": "engagement_trends",
+    "Content Virality": "content_virality",
+    "Audience Location": "audience_location",
+    "Audience Age Range": "audience_age_range",
+    "Content Format Preferences": "content_format_preferences",
+    "Influencer Marketing Interest": "influencer_marketing_interest",
+    "Social Causes Support": "social_causes_support",
 }
 
-# Displaying the metrics in Streamlit
-for key, value in formatted_data_display.items():
-    st.metric(key, value)
+# Display sections
+for section, data_key in sections.items():
+    st.header(section)
+    if section == "Top Countries":
+        st.text("Top Countries")
+        df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Greens_d")
+        ax.set_xlabel('Country', fontsize=12)
+        ax.set_ylabel('Percentage', fontsize=12)
+        plt.tight_layout()
+        st.pyplot(fig)
+    elif section in ["Age & Gender", "Ethnicity", "Languages", "Audience Interests", "Household Income", "Education Level", "Marital Status", "Employment Status", "Device Usage", "Social Media Platforms", "Content Preferences", "Brand Engagement", "Post Frequency", "Content Themes", "Sponsored Content", "Influencer Collaborations", "User Sentiment", "Engagement Trends", "Content Virality", "Audience Location", "Audience Age Range", "Content Format Preferences", "Influencer Marketing Interest", "Social Causes Support"]:
+        df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Blues_d")
+        ax.set_xlabel(section, fontsize=10)
+        ax.set_ylabel('Percentage', fontsize=10)
+        plt.tight_layout()
+        st.pyplot(fig)
+    elif section == "Estimated Reach":
+        reach_data = data[data_key]
+        fig, ax = plt.subplots(figsize=(6, 4))
+        reach_values = [f"{value[0]}M - {value[1]}M" for value in reach_data.values()]
+        ax.bar(reach_data.keys(), reach_values, color='orange')
+        ax.set_xlabel('Reach Type', fontsize=10)
+        ax.set_ylabel('Reach Range', fontsize=10)
+        plt.tight_layout()
+        st.pyplot(fig)
+    elif section == "Estimated Impressions":
+        st.text(f"Estimated Impressions: {data[data_key]}M")
+    else:
+        if isinstance(data[data_key], dict):
+            for key, value in data[data_key].items():
+                st.metric(key, value)
+        else:
+            st.metric(section, data[data_key])
 
-# Plot functions
-def plot_top_countries(data):
-    df = pd.DataFrame(list(data.items()), columns=["Country", "Percentage"])
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x="Percentage", y="Country", data=df)
-    plt.title("Top Countries by Percentage")
-    st.pyplot(plt.gcf())
-
-def plot_age_gender(data):
-    df = pd.DataFrame(list(data.items()), columns=["Gender", "Percentage"])
-    plt.figure(figsize=(6, 6))
-    plt.pie(df["Percentage"], labels=df["Gender"], autopct="%1.1f%%", startangle=140)
-    plt.title("Age & Gender Distribution")
-    st.pyplot(plt.gcf())
-
-def plot_ethnicity(data):
-    df = pd.DataFrame(list(data.items()), columns=["Ethnicity", "Percentage"])
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x="Percentage", y="Ethnicity", data=df)
-    plt.title("Ethnicity Distribution")
-    st.pyplot(plt.gcf())
-
-def plot_languages(data):
-    df = pd.DataFrame(list(data.items()), columns=["Language", "Percentage"])
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x="Percentage", y="Language", data=df)
-    plt.title("Language Distribution")
-    st.pyplot(plt.gcf())
-
-def plot_audience_interests(data):
-    df = pd.DataFrame(list(data.items()), columns=["Interest", "Percentage"])
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x="Percentage", y="Interest", data=df)
-    plt.title("Audience Interests")
-    st.pyplot(plt.gcf())
-
-def plot_household_income(data):
-    df = pd.DataFrame(list(data.items()), columns=["Income", "Percentage"])
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x="Percentage", y="Income", data=df)
-    plt.title("Household Income Distribution")
-    st.pyplot(plt.gcf())
-
-def plot_education_level(data):
-    df = pd.DataFrame(list(data.items()), columns=["Education Level", "Percentage"])
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x="Percentage", y="Education Level", data=df)
-    plt.title("Education Level Distribution")
-    st.pyplot(plt.gcf())
-
-def plot_marital_status(data):
-    df = pd.DataFrame(list(data.items()), columns=["Marital Status", "Percentage"])
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x="Percentage", y="Marital Status", data=df)
-    plt.title("Marital Status Distribution")
-    st.pyplot(plt.gcf())
-
-def plot_employment_status(data):
-    df = pd.DataFrame(list(data.items()), columns=["Employment Status", "Percentage"])
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x="Percentage", y="Employment Status", data=df)
-    plt.title("Employment Status Distribution")
-    st.pyplot(plt.gcf())
-
-def plot_device_usage(data):
-    df = pd.DataFrame(list(data.items()), columns=["Device", "Percentage"])
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x="Percentage", y="Device", data=df)
-    plt.title("Device Usage")
-    st.pyplot(plt.gcf())
-
-# Plotting the graphs
-plot_top_countries(data["top_countries"])
-plot_age_gender(data["age_gender"])
-plot_ethnicity(data["ethnicity"])
-plot_languages(data["languages"])
-plot_audience_interests(data["audience_interests"])
-plot_household_income(data["household_income"])
-plot_education_level(data["education_level"])
-plot_marital_status(data["marital_status"])
-plot_employment_status(data["employment_status"])
-plot_device_usage(data["device_usage"])
-
-# Button to generate and download the PDF report
-if st.button("Generate PDF Report"):
+# Generate PDF report
+if st.button("Export Report as PDF"):
     pdf_buffer = create_pdf_report(data)
     st.download_button(
         label="Download PDF Report",
         data=pdf_buffer,
-        file_name="SCK_Media_Metrics_Report.pdf",
-        mime="application/pdf",
+        file_name="Digital_Metrics_Report.pdf",
+        mime="application/pdf"
     )
+
+# Running the Streamlit App
+if __name__ == "__main__":
+    st.run()
