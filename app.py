@@ -311,6 +311,89 @@ formatted_data_display = {
 for key, value in formatted_data_display.items():
     st.metric(key, value)
 
+# Plot functions
+def plot_top_countries(data):
+    df = pd.DataFrame(list(data.items()), columns=["Country", "Percentage"])
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x="Percentage", y="Country", data=df)
+    plt.title("Top Countries by Percentage")
+    st.pyplot(plt.gcf())
+
+def plot_age_gender(data):
+    df = pd.DataFrame(list(data.items()), columns=["Gender", "Percentage"])
+    plt.figure(figsize=(6, 6))
+    plt.pie(df["Percentage"], labels=df["Gender"], autopct="%1.1f%%", startangle=140)
+    plt.title("Age & Gender Distribution")
+    st.pyplot(plt.gcf())
+
+def plot_ethnicity(data):
+    df = pd.DataFrame(list(data.items()), columns=["Ethnicity", "Percentage"])
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x="Percentage", y="Ethnicity", data=df)
+    plt.title("Ethnicity Distribution")
+    st.pyplot(plt.gcf())
+
+def plot_languages(data):
+    df = pd.DataFrame(list(data.items()), columns=["Language", "Percentage"])
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x="Percentage", y="Language", data=df)
+    plt.title("Language Distribution")
+    st.pyplot(plt.gcf())
+
+def plot_audience_interests(data):
+    df = pd.DataFrame(list(data.items()), columns=["Interest", "Percentage"])
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x="Percentage", y="Interest", data=df)
+    plt.title("Audience Interests")
+    st.pyplot(plt.gcf())
+
+def plot_household_income(data):
+    df = pd.DataFrame(list(data.items()), columns=["Income", "Percentage"])
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x="Percentage", y="Income", data=df)
+    plt.title("Household Income Distribution")
+    st.pyplot(plt.gcf())
+
+def plot_education_level(data):
+    df = pd.DataFrame(list(data.items()), columns=["Education Level", "Percentage"])
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x="Percentage", y="Education Level", data=df)
+    plt.title("Education Level Distribution")
+    st.pyplot(plt.gcf())
+
+def plot_marital_status(data):
+    df = pd.DataFrame(list(data.items()), columns=["Marital Status", "Percentage"])
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x="Percentage", y="Marital Status", data=df)
+    plt.title("Marital Status Distribution")
+    st.pyplot(plt.gcf())
+
+def plot_employment_status(data):
+    df = pd.DataFrame(list(data.items()), columns=["Employment Status", "Percentage"])
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x="Percentage", y="Employment Status", data=df)
+    plt.title("Employment Status Distribution")
+    st.pyplot(plt.gcf())
+
+def plot_device_usage(data):
+    df = pd.DataFrame(list(data.items()), columns=["Device", "Percentage"])
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x="Percentage", y="Device", data=df)
+    plt.title("Device Usage")
+    st.pyplot(plt.gcf())
+
+# Plotting the graphs
+plot_top_countries(data["top_countries"])
+plot_age_gender(data["age_gender"])
+plot_ethnicity(data["ethnicity"])
+plot_languages(data["languages"])
+plot_audience_interests(data["audience_interests"])
+plot_household_income(data["household_income"])
+plot_education_level(data["education_level"])
+plot_marital_status(data["marital_status"])
+plot_employment_status(data["employment_status"])
+plot_device_usage(data["device_usage"])
+
 # Button to generate and download the PDF report
 if st.button("Generate PDF Report"):
     pdf_buffer = create_pdf_report(data)
