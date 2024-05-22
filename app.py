@@ -50,102 +50,36 @@ data = {
 def create_pdf_report(data):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
-
+    
     # Add Company Logo
     logo_path = "sck.png"  # Replace with the actual logo path
     p.drawImage(logo_path, 30, 750, width=100, height=50)
-
+    
     p.setFont("Helvetica-Bold", 16)
     p.drawString(150, 750, "Rick Ross Instagram Report")
     p.setFont("Helvetica", 12)
     p.drawString(150, 735, "-----------------------------")
-
+    
     # Report content
-    report_content = [
-        "Total Followers: {0}M",
-        "Quality Audience: {1}M",
-        "Followers Growth: {2}%",
-        "Engagement Rate: {3}%",
-        "Authentic Engagement per Post: {4}K",
-        "Most Recent Post: {5}",
-        "Global Rank: {6}",
-        "Top Countries:",
-        "Age & Gender:",
-        "Ethnicity:",
-        "Languages:",
-        "Audience Interests:",
-        "Household Income:",
-        "Estimated Reach:",
-        "Estimated Impressions:",
-        "Education Level:",
-        "Marital Status:",
-        "Employment Status:",
-        "Device Usage:",
-        "Social Media Platforms:",
-        "Content Preferences:",
-        "Brand Engagement:",
-        "Post Frequency:",
-        "Content Themes:",
-        "Sponsored Content:",
-        "Influencer Collaborations:",
-        "User Sentiment:",
-        "Engagement Trends:",
-        "Content Virality:",
-        "Audience Location:",
-        "Audience Age Range:",
-        "Content Format Preferences:",
-        "Influencer Marketing Interest:",
-        "Social Causes Support:",
-        "Subscriptions:",
-    ]
-
     y_position = 720
-    for content in report_content:
-        if content == "Top Countries:":
-            y_position -= 15
-            p.setFont("Helvetica-Bold", 12)
-            p.drawString(150, y_position, content)
-            top_countries = data["top_countries"]
-            for country, value in top_countries.items():
+    for metric, value in data.items():
+        if y_position < 150:
+            p.showPage()
+            p.setFont("Helvetica", 12)
+            y_position = 750
+
+        p.setFont("Helvetica-Bold", 12)
+        p.drawString(30, y_position, f"{metric.replace('_', ' ').capitalize()}:")
+        p.setFont("Helvetica", 10)
+        if isinstance(value, dict):
+            for sub_metric, sub_value in value.items():
                 y_position -= 15
-                p.setFont("Helvetica", 10)
-                p.drawString(150, y_position, f"{country}: {value}%")
-        elif content in ["Age & Gender:", "Ethnicity:", "Languages:", "Audience Interests:", "Household Income:", "Education Level:", "Marital Status:", "Employment Status:", "Device Usage:", "Social Media Platforms:", "Content Preferences:", "Brand Engagement:", "Post Frequency:", "Content Themes:", "Sponsored Content:", "Influencer Collaborations:", "User Sentiment:", "Engagement Trends:", "Content Virality:", "Audience Location:", "Audience Age Range:", "Content Format Preferences:", "Influencer Marketing Interest:", "Social Causes Support:", "Subscriptions:"]:
-            y_position -= 15
-            p.setFont("Helvetica-Bold", 12)
-            p.drawString(150, y_position, content)
-            metrics_data = data[content.split(':')[0].lower().replace(' ', '_')]
-            df = pd.DataFrame.from_dict(metrics_data, orient='index', columns=['Percentage'])
-            fig, ax = plt.subplots(figsize=(6, 4))
-            ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Blues_d")
-            ax.set_xlabel(content.split(':')[0], fontsize=10)
-            ax.set_ylabel('Percentage', fontsize=10)
-            plt.tight_layout()
-            plt.savefig("temp_plot.png", format="png", bbox_inches="tight")
-            p.drawInlineImage("temp_plot.png", inch, y_position - 15, width=400, height=300)
-            y_position -= 315
-        elif content == "Estimated Reach:":
-            y_position -= 15
-            p.setFont("Helvetica-Bold", 12)
-            p.drawString(150, y_position, content)
-            reach_data = data["estimated_reach"]
-            for key, value in reach_data.items():
-                y_position -= 15
-                p.setFont("Helvetica", 10)
-                p.drawString(150, y_position, f"{key.capitalize()} Reach: {value[0]}M - {value[1]}M")
-        elif content == "Estimated Impressions:":
-            y_position -= 15
-            p.setFont("Helvetica-Bold", 12)
-            p.drawString(150, y_position, content)
-            impressions_data = data["estimated_impressions"]
-            p.setFont("Helvetica", 10)
-            p.drawString(150, y_position - 15, f"Estimated Impressions: {impressions_data}M")
-            y_position -= 30
+                p.drawString(40, y_position, f"{sub_metric}: {sub_value}")
         else:
             y_position -= 15
-            p.setFont("Helvetica", 12)
-            p.drawString(150, y_position, content.format(*[data.get(key.lower().replace(" ", "_")) for key in content.split(':')[0].split() if key.lower() != "per"]))
-
+            p.drawString(40, y_position, str(value))
+        y_position -= 30
+    
     p.showPage()
     p.save()
     buffer.seek(0)
@@ -155,26 +89,26 @@ def create_pdf_report(data):
 st.title("Digital Metrics Report")
 
 st.sidebar.title("Metrics Dashboard")
-selected_metric = st.sidebar.selectbox("Select Metric", list(data.keys()))
-
-# Display selected metric data
-st.header(f"{selected_metric.capitalize()} Data")
-if isinstance(data[selected_metric], dict):
-    metric_df = pd.DataFrame.from_dict(data[selected_metric], orient='index', columns=['Value'])
-    st.table(metric_df)
-    fig, ax = plt.subplots()
-    sns.barplot(x=metric_df.index, y='Value', data=metric_df, palette="Blues_d", ax=ax)
-    ax.set_title(f"{selected_metric.capitalize()} Distribution")
-    st.pyplot(fig)
-else:
-    st.text(f"{selected_metric.capitalize()}: {data[selected_metric]}")
-
-# Generate PDF Report Button
-if st.button("Generate PDF Report"):
+if st.sidebar.button("Download Full Report"):
     pdf_buffer = create_pdf_report(data)
-    st.download_button(
+    st.sidebar.download_button(
         label="Download Report",
         data=pdf_buffer,
         file_name="Digital_Metrics_Report.pdf",
         mime="application/pdf",
     )
+
+# Display all metrics data on the main page
+st.header("All Metrics Data")
+for metric, value in data.items():
+    st.subheader(metric.replace('_', ' ').capitalize())
+    if isinstance(value, dict):
+        metric_df = pd.DataFrame.from_dict(value, orient='index', columns=['Value'])
+        st.table(metric_df)
+        fig, ax = plt.subplots()
+        sns.barplot(x=metric_df.index, y='Value', data=metric_df, palette="Blues_d", ax=ax)
+        ax.set_title(f"{metric.replace('_', ' ').capitalize()} Distribution")
+        plt.xticks(rotation=90)
+        st.pyplot(fig)
+    else:
+        st.text(f"{metric.replace('_', ' ').capitalize()}: {value}")
