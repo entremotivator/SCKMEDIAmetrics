@@ -153,8 +153,7 @@ data = {
     },
     "monthly_subscribers": 22000,
     "ppv_subscriptions": 2.2,
-
-    
+    },
 def create_pdf_report(data):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
