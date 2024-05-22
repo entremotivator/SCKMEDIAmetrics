@@ -305,7 +305,7 @@ def create_pdf_report(data):
 st.title("SCK Media Metrics Report")
 
 # Add Company Logo
-st.image("sck_logo.png", width=200)  # Replace with the actual logo path
+st.image("sck.png", width=200)  # Replace with the actual logo path
 
 # Add Company Description
 st.write(
