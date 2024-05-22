@@ -153,15 +153,14 @@ data = {
     },
     "monthly_subscribers": 22000,
     "ppv_subscriptions": 2.2,
-}
 
-# Function to create a PDF report
+    
 def create_pdf_report(data):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
 
     # Add Company Logo
-    logo_path = "sck.png"  # Replace with the actual logo path
+    logo_path = "sck_logo.png"  # Replace with the actual logo path
     p.drawImage(logo_path, 30, 750, width=100, height=50)
 
     p.setFont("Helvetica-Bold", 16)
@@ -275,21 +274,39 @@ def create_pdf_report(data):
             p.drawString(150, y_position, content)
             y_position -= 15
             p.setFont("Helvetica", 10)
-            for key, value in data[
-                content.lower().replace(" & ", "_").replace(" ", "_").replace(":", "")
-            ].items():
-                p.drawString(150, y_position, f"{key}: {value}%")
-                y_position -= 15
+            key = content.lower().replace(" & ", "_").replace(" ", "_").replace(":", "")
+            if key in data:
+                for sub_key, value in data[key].items():
+                    p.drawString(150, y_position, f"{sub_key}: {value}%")
+                    y_position -= 15
+        elif content == "Estimated Reach:":
+            y_position -= 15
+            p.setFont("Helvetica-Bold", 12)
+            p.drawString(150, y_position, content)
+            y_position -= 15
+            p.setFont("Helvetica", 10)
+            p.drawString(150, y_position, f"Post: {data['estimated_reach']['post']}")
+            y_position -= 15
+            p.drawString(150, y_position, f"Story: {data['estimated_reach']['story']}")
+        elif content == "Estimated Impressions:":
+            y_position -= 15
+            p.setFont("Helvetica", 12)
+            p.drawString(
+                150,
+                y_position,
+                f"Estimated Impressions: {data['estimated_impressions']}M",
+            )
         else:
             y_position -= 15
             p.setFont("Helvetica", 12)
             key = content.lower().replace(" ", "_").replace(":", "")
-            value = data[key]
-            p.drawString(
-                150,
-                y_position,
-                content.format(*[round(v, 2) for v in (data[key],)] if isinstance(value, (float, int)) else data[key]),
-            )
+            if key in data:
+                value = data[key]
+                p.drawString(
+                    150,
+                    y_position,
+                    content.format(*[round(v, 2) for v in (data[key],)] if isinstance(value, (float, int)) else data[key]),
+                )
 
         if y_position < 50:
             # Add a new page if content goes beyond page length
