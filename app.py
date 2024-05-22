@@ -7,9 +7,6 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 
-# SCK Media is a leading social media analytics and influencer marketing company.
-# We provide comprehensive data-driven insights to help brands and creators optimize their online presence and engagement.
-
 # Sample Data
 data = {
     "followers": 1500000.05,
@@ -164,13 +161,37 @@ def create_pdf_report(data):
     p = canvas.Canvas(buffer, pagesize=letter)
 
     # Add Company Logo
-    logo_path = "sck.png"  # Replace with the actual logo path
+    logo_path = "sck_logo.png"  # Replace with the actual logo path
     p.drawImage(logo_path, 30, 750, width=100, height=50)
 
     p.setFont("Helvetica-Bold", 16)
     p.drawString(150, 750, "SCK Media Metrics Report")
     p.setFont("Helvetica", 12)
     p.drawString(150, 735, "-----------------------------")
+
+    # Add Company Description
+    p.setFont("Helvetica", 10)
+    p.drawString(
+        150,
+        720,
+        "SCK MEDIA TV IS AN INNOVATIVE GLOBAL PAY-PER-VIEW (PPV) PLATFORM DEDICATED TO SOCIAL CONTENT CREATORS,",
+    )
+    p.drawString(
+        150,
+        705,
+        "ALLOWING CONTENT CREATORS TO MONETIZE THEIR 'eSCKlusive' CONTENT ON THEIR OWN TERMS.",
+    )
+    p.drawString(150, 690, "DO YOU CREATE CONTENT 'eSCKlusive' ENOUGH FOR PAY-PER-VIEW?")
+    p.drawString(
+        150,
+        675,
+        "DO YOU HAVE AN ACTIVE SOCIAL MEDIA FOLLOWING, TRENDING CONTENT OR MONETIZABLE CONCEPTS?",
+    )
+    p.drawString(
+        150,
+        660,
+        "ARE YOU READY TO BE YOUR OWN SOCIAL CONTENT CHANNEL, OWN YOUR CONTENT & RECEIVE THE LIONS SHARE OF YOUR CONTENT'S ENGAGEMENT, ADVERTISING & RESIDUAL REVENUE?",
+    )
 
     # Report content
     report_content = [
@@ -212,7 +233,7 @@ def create_pdf_report(data):
         "Social Causes Support:",
     ]
 
-    y_position = 720
+    y_position = 630
     for content in report_content:
         if content == "Top Countries:":
             y_position -= 15
@@ -282,6 +303,22 @@ def create_pdf_report(data):
 
 # Streamlit App
 st.title("SCK Media Metrics Report")
+
+# Add Company Logo
+st.image("sck_logo.png", width=200)  # Replace with the actual logo path
+
+# Add Company Description
+st.write(
+    "SCK MEDIA TV IS AN INNOVATIVE GLOBAL PAY-PER-VIEW (PPV) PLATFORM DEDICATED TO SOCIAL CONTENT CREATORS,"
+)
+st.write("ALLOWING CONTENT CREATORS TO MONETIZE THEIR 'eSCKlusive' CONTENT ON THEIR OWN TERMS.")
+st.write("DO YOU CREATE CONTENT 'eSCKlusive' ENOUGH FOR PAY-PER-VIEW?")
+st.write(
+    "DO YOU HAVE AN ACTIVE SOCIAL MEDIA FOLLOWING, TRENDING CONTENT OR MONETIZABLE CONCEPTS?"
+)
+st.write(
+    "ARE YOU READY TO BE YOUR OWN SOCIAL CONTENT CHANNEL, OWN YOUR CONTENT & RECEIVE THE LIONS SHARE OF YOUR CONTENT'S ENGAGEMENT, ADVERTISING & RESIDUAL REVENUE?"
+)
 
 # Display Data
 st.subheader("Overall Metrics")
