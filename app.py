@@ -155,6 +155,7 @@ data = {
     "ppv_subscriptions": 2.2,
 }
 
+# Function to create a PDF report
 def create_pdf_report(data):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
@@ -163,6 +164,7 @@ def create_pdf_report(data):
     logo_path = "sck.png"  # Replace with the actual logo path
     p.drawImage(logo_path, 30, 750, width=100, height=50)
 
+    # Add Title
     p.setFont("Helvetica-Bold", 16)
     p.drawString(150, 750, "SCK Media Metrics Report")
     p.setFont("Helvetica", 12)
@@ -170,47 +172,38 @@ def create_pdf_report(data):
 
     # Add Company Description
     p.setFont("Helvetica", 10)
-    p.drawString(
-        30,
-        720,
+    description = [
         "SCK MEDIA TV IS AN INNOVATIVE GLOBAL PAY-PER-VIEW (PPV) PLATFORM DEDICATED TO SOCIAL CONTENT CREATORS,",
-    )
-    p.drawString(
-        30,
-        705,
         "ALLOWING CONTENT CREATORS TO MONETIZE THEIR 'eSCKlusive' CONTENT ON THEIR OWN TERMS.",
-    )
-    p.drawString(30, 690, "DO YOU CREATE CONTENT 'eSCKlusive' ENOUGH FOR PAY-PER-VIEW?")
-    p.drawString(
-        30,
-        675,
+        "DO YOU CREATE CONTENT 'eSCKlusive' ENOUGH FOR PAY-PER-VIEW?",
         "DO YOU HAVE AN ACTIVE SOCIAL MEDIA FOLLOWING, TRENDING CONTENT OR MONETIZABLE CONCEPTS?",
-    )
-    p.drawString(
-        30,
-        660,
-        "ARE YOU READY TO BE YOUR OWN SOCIAL CONTENT CHANNEL, OWN YOUR CONTENT & RECEIVE THE LION'S SHARE OF YOUR CONTENT'S ENGAGEMENT, ADVERTISING & RESIDUAL REVENUE?",
-    )
+        "ARE YOU READY TO BE YOUR OWN SOCIAL CONTENT CHANNEL, OWN YOUR CONTENT & RECEIVE THE LIONS SHARE OF YOUR",
+        "CONTENT'S ENGAGEMENT, ADVERTISING & RESIDUAL REVENUE?"
+    ]
+    y_position = 720
+    for line in description:
+        p.drawString(150, y_position, line)
+        y_position -= 15
 
     # Report content
     report_content = [
-        "Total Followers: {0}M".format(data['followers'] / 1e6),
-        "Quality Audience: {0}M".format(data['quality_audience']),
-        "Followers Growth: {0}%".format(data['followers_growth']),
-        "Engagement Rate: {0}%".format(data['engagement_rate']),
-        "Authentic Engagement per Post: {0}K".format(data['authentic_engagement']),
-        "Most Recent Post: {0}".format(data['most_recent_post']),
-        "Global Rank: {0}".format(data['global_rank']),
-        "Monthly Subscribers: {0}K".format(data['monthly_subscribers'] / 1e3),
-        "PPV Subscriptions: {0}M".format(data['ppv_subscriptions']),
+        "Total Followers: {0}M",
+        "Quality Audience: {1}M",
+        "Followers Growth: {2}%",
+        "Engagement Rate: {3}%",
+        "Authentic Engagement per Post: {4}K",
+        "Most Recent Post: {5}",
+        "Global Rank: {6}",
+        "Monthly Subscribers: {7}K",
+        "PPV Subscriptions: {8}M",
+    ]
+    report_content.extend([
         "Top Countries:",
         "Age & Gender:",
         "Ethnicity:",
         "Languages:",
         "Audience Interests:",
         "Household Income:",
-        "Estimated Reach:",
-        "Estimated Impressions:",
         "Education Level:",
         "Marital Status:",
         "Employment Status:",
@@ -220,8 +213,8 @@ def create_pdf_report(data):
         "Brand Engagement:",
         "Post Frequency:",
         "Content Themes:",
-        "Sponsored Content:",
-        "Influencer Collaborations:",
+        "Sponsored Content Interest:",
+        "Influencer Collaborations Interest:",
         "User Sentiment:",
         "Engagement Trends:",
         "Content Virality:",
@@ -229,68 +222,101 @@ def create_pdf_report(data):
         "Audience Age Range:",
         "Content Format Preferences:",
         "Influencer Marketing Interest:",
-        "Social Causes Support:",
-    ]
+        "Support for Social Causes:",
+    ])
 
-    # Format the report content with the actual data
-    formatted_content = [
-        report_content[0],
-        report_content[1],
-        report_content[2],
-        report_content[3],
-        report_content[4],
-        report_content[5],
-        report_content[6],
-        report_content[7],
-        report_content[8],
-        report_content[9],
-        report_content[10],
-        report_content[11],
-        report_content[12],
-        report_content[13],
-        report_content[14],
-        report_content[15],
-        report_content[16],
-        report_content[17],
-        report_content[18],
-        report_content[19],
-        report_content[20],
-        report_content[21],
-        report_content[22],
-        report_content[23],
-        report_content[24],
-        report_content[25],
-        report_content[26],
-        report_content[27],
-        report_content[28],
-        report_content[29],
-        report_content[30],
-        report_content[31],
-        report_content[32],
-        report_content[33],
-        report_content[34],
-        report_content[35],
-    ]
+    # Formatting the data
+    formatted_data = {
+        "Total Followers": f"{data['followers'] / 1e6:.2f}M",
+        "Quality Audience": f"{data['quality_audience']}M",
+        "Followers Growth": f"{data['followers_growth']}%",
+        "Engagement Rate": f"{data['engagement_rate']}%",
+        "Authentic Engagement per Post": f"{data['authentic_engagement']}K",
+        "Most Recent Post": data["most_recent_post"],
+        "Global Rank": data["global_rank"],
+        "Monthly Subscribers": f"{data['monthly_subscribers'] / 1e3:.1f}K",
+        "PPV Subscriptions": f"{data['ppv_subscriptions'] / 1e6:.1f}M",
+    }
 
-    y_position = 640
-    for line in formatted_content:
-        if line.endswith(":"):
-            p.setFont("Helvetica-Bold", 12)
-        else:
-            p.setFont("Helvetica", 10)
-        p.drawString(30, y_position, line)
+    # Populate the PDF with the formatted data
+    y_position = 600
+    p.setFont("Helvetica", 10)
+    for item in report_content[:9]:
+        key = item.split(":")[0].strip()
+        value = formatted_data.get(key, "N/A")
+        p.drawString(30, y_position, item.format(value))
         y_position -= 15
 
-    p.showPage()
+    # Add multi-line sections
+    multi_line_sections = [
+        ("Top Countries", data["top_countries"]),
+        ("Age & Gender", data["age_gender"]),
+        ("Ethnicity", data["ethnicity"]),
+        ("Languages", data["languages"]),
+        ("Audience Interests", data["audience_interests"]),
+        ("Household Income", data["household_income"]),
+        ("Education Level", data["education_level"]),
+        ("Marital Status", data["marital_status"]),
+        ("Employment Status", data["employment_status"]),
+        ("Device Usage", data["device_usage"]),
+        ("Social Media Platforms", data["social_media_platforms"]),
+        ("Content Preferences", data["content_preferences"]),
+        ("Brand Engagement", data["brand_engagement"]),
+        ("Post Frequency", data["post_frequency"]),
+        ("Content Themes", data["content_themes"]),
+        ("Sponsored Content Interest", data["sponsored_content"]),
+        ("Influencer Collaborations Interest", data["influencer_collaborations"]),
+        ("User Sentiment", data["user_sentiment"]),
+        ("Engagement Trends", data["engagement_trends"]),
+        ("Content Virality", data["content_virality"]),
+        ("Audience Location", data["audience_location"]),
+        ("Audience Age Range", data["audience_age_range"]),
+        ("Content Format Preferences", data["content_format_preferences"]),
+        ("Influencer Marketing Interest", data["influencer_marketing_interest"]),
+        ("Support for Social Causes", data["social_causes_support"]),
+    ]
+
+    for section, details in multi_line_sections:
+        if y_position < 100:
+            p.showPage()
+            y_position = 750
+        p.drawString(30, y_position, section + ":")
+        y_position -= 15
+        for sub_item, sub_value in details.items():
+            p.drawString(50, y_position, f"{sub_item}: {sub_value}")
+            y_position -= 15
+
+    # Save PDF to buffer
     p.save()
     buffer.seek(0)
     return buffer
 
-# PDF Report
-buffer = create_pdf_report(data)
-st.download_button(
-    label="Download PDF Report",
-    data=buffer,
-    file_name="SCK_Media_Metrics_Report.pdf",
-    mime="application/pdf"
-)
+# Streamlit App
+st.title("SCK Media Metrics Report")
+
+# Formatted Data for Display
+formatted_data_display = {
+    "Total Followers": f"{data['followers'] / 1e6:.2f}M",
+    "Quality Audience": f"{data['quality_audience']}M",
+    "Followers Growth": f"{data['followers_growth']}%",
+    "Engagement Rate": f"{data['engagement_rate']}%",
+    "Authentic Engagement per Post": f"{data['authentic_engagement']}K",
+    "Most Recent Post": data["most_recent_post"],
+    "Global Rank": data["global_rank"],
+    "Monthly Subscribers": f"{data['monthly_subscribers'] / 1e3:.1f}K",
+    "PPV Subscriptions": f"{data['ppv_subscriptions'] / 1e6:.1f}M",
+}
+
+# Displaying the metrics in Streamlit
+for key, value in formatted_data_display.items():
+    st.metric(key, value)
+
+# Button to generate and download the PDF report
+if st.button("Generate PDF Report"):
+    pdf_buffer = create_pdf_report(data)
+    st.download_button(
+        label="Download PDF Report",
+        data=pdf_buffer,
+        file_name="SCK_Media_Metrics_Report.pdf",
+        mime="application/pdf",
+    )
