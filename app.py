@@ -9,7 +9,7 @@ from reportlab.lib.units import inch
 
 # Sample Data
 data = {
-    "followers": 19.5,
+    "followers": 1,500,000.05,
     "quality_audience": 12.4,
     "followers_growth": 0.39,
     "engagement_rate": 1.36,
