@@ -123,6 +123,7 @@ def create_pdf_report(data):
             plt.tight_layout()
             plt.savefig("temp_plot.png", format="png", bbox_inches="tight")
             p.drawInlineImage("temp_plot.png", inch, y_position - 15, width=400, height=300)
+            y_position -= 315
         elif content == "Estimated Reach:":
             y_position -= 15
             p.setFont("Helvetica-Bold", 12)
@@ -139,6 +140,7 @@ def create_pdf_report(data):
             impressions_data = data["estimated_impressions"]
             p.setFont("Helvetica", 10)
             p.drawString(150, y_position - 15, f"Estimated Impressions: {impressions_data}M")
+            y_position -= 30
         else:
             y_position -= 15
             p.setFont("Helvetica", 12)
