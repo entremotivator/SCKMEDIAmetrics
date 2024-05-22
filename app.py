@@ -179,16 +179,15 @@ data = {
 def create_pdf_report(data):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
-    width, height = letter
 
     # Add Company Logo
     logo_path = "sck.png"  # Replace with the actual logo path
-    p.drawImage(logo_path, 30, height - 60, width=100, height=50)
+    p.drawImage(logo_path, 30, 750, width=100, height=50)
 
     p.setFont("Helvetica-Bold", 16)
-    p.drawString(150, height - 60, "Rick Ross Instagram Report")
+    p.drawString(150, 750, "Rick Ross Instagram Report")
     p.setFont("Helvetica", 12)
-    p.drawString(150, height - 80, "-----------------------------")
+    p.drawString(150, 735, "-----------------------------")
 
     # Report content
     report_content = [
@@ -228,91 +227,152 @@ def create_pdf_report(data):
         "Social Causes Support:",
     ]
 
-    y_position = height - 100
+    y_position = 720
     for content in report_content:
         if content == "Top Countries:":
-            y_position -= 20
+            y_position -= 15
             p.setFont("Helvetica-Bold", 12)
-            p.drawString(30, y_position, content)
+            p.drawString(150, y_position, content)
             top_countries = data["top_countries"]
             for country, value in top_countries.items():
                 y_position -= 15
                 p.setFont("Helvetica", 10)
-                p.drawString(50, y_position, f"{country}: {value}%")
+                p.drawString(150, y_position, f"{country}: {value}%")
         elif content in ["Age & Gender:", "Ethnicity:", "Languages:", "Audience Interests:", "Household Income:", "Education Level:", "Marital Status:", "Employment Status:", "Device Usage:", "Social Media Platforms:", "Content Preferences:", "Brand Engagement:", "Post Frequency:", "Content Themes:", "Sponsored Content:", "Influencer Collaborations:", "User Sentiment:", "Engagement Trends:", "Content Virality:", "Audience Location:", "Audience Age Range:", "Content Format Preferences:", "Influencer Marketing Interest:", "Social Causes Support:"]:
-            y_position -= 20
+            y_position -= 15
             p.setFont("Helvetica-Bold", 12)
-            p.drawString(30, y_position, content)
-            key = content.strip(":").lower().replace(" ", "_")
-            values = data[key]
-            for sub_key, sub_value in values.items():
-                y_position -= 15
-                p.setFont("Helvetica", 10)
-                p.drawString(50, y_position, f"{sub_key}: {sub_value}%")
+            p.drawString(150, y_position, content)
+            metrics_data = data[content.split(':')[0].lower().replace(' ', '_')]
+            df = pd.DataFrame.from_dict(metrics_data, orient='index', columns=['Percentage'])
+            fig, ax = plt.subplots(figsize=(6, 4))
+            ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Blues_d")
+            ax.set_xlabel(content.split(':')[0], fontsize=10)
+            ax.set_ylabel('Percentage', fontsize=10)
+            plt.tight_layout()
+            plt.savefig("temp_plot.png", format="png", bbox_inches="tight")
+            p.drawInlineImage("temp_plot.png", inch, y_position - 15, width=400, height=300)
         elif content == "Estimated Reach:":
-            y_position -= 20
+            y_position -= 15
             p.setFont("Helvetica-Bold", 12)
-            p.drawString(30, y_position, content)
-            reach_values = data["estimated_reach"]
-            for reach_key, reach_value in reach_values.items():
+            p.drawString(150, y_position, content)
+            reach_data = data["estimated_reach"]
+            for key, value in reach_data.items():
                 y_position -= 15
                 p.setFont("Helvetica", 10)
-                p.drawString(50, y_position, f"{reach_key.capitalize()} Reach: {reach_value[0]}M - {reach_value[1]}M")
+                p.drawString(150, y_position, f"{key.capitalize()} Reach: {value[0]}M - {value[1]}M")
+        elif content == "Estimated Impressions:":
+            y_position -= 15
+            p.setFont("Helvetica-Bold", 12)
+            p.drawString(150, y_position, content)
+            impressions_data = data["estimated_impressions"]
+            p.setFont("Helvetica", 10)
+            p.drawString(150, y_position - 15, f"Estimated Impressions: {impressions_data}M")
         else:
-            y_position -= 20
-            p.setFont("Helvetica", 12)
-            if content == "Estimated Impressions:":
-                p.drawString(30, y_position, content + f" {data['estimated_impressions']}M")
-            else:
-                p.drawString(30, y_position, content.format(data["followers"], data["quality_audience"], data["followers_growth"], data["engagement_rate"], data["authentic_engagement"], data["most_recent_post"], data["global_rank"]))
+            y_position -= 15
+            p.setFont("Helvetica", 10)
+            p.drawString(150, y_position, content.format(*[data[key] for key in content.split(':')[1].split()]))
 
     p.showPage()
     p.save()
-
     buffer.seek(0)
     return buffer
 
-# Function to create a seaborn chart
-def create_seaborn_chart(data, title, color_palette):
-    plt.figure(figsize=(10, 6))
-    keys = list(data.keys())
-    values = list(data.values())
-    sns.barplot(x=values, y=keys, palette=color_palette)
-    plt.title(title)
-    plt.xlabel('Percentage')
-    plt.ylabel('Category')
-    plt.tight_layout()
+# Streamlit App
+st.set_page_config(page_title="Digital Metrics Report", page_icon="sck.png", layout="wide", initial_sidebar_state="expanded")
 
-    # Save the plot to a buffer
-    buffer = BytesIO()
-    plt.savefig(buffer, format='png')
-    buffer.seek(0)
-    plt.close()
+# Add logo to sidebar
+st.sidebar.image("sck.png", use_column_width=True)
 
-    return buffer
+st.title("Digital Metrics Report for Investors")
 
-# Streamlit Interface
-st.title("Instagram Data Analysis & PDF Report")
+# Display sections
 
-st.write("### Rick Ross Instagram Report")
-
-# Display Charts
-color_palettes = {
-    "top_countries": "viridis",
-    "age_gender": "coolwarm",
-    "ethnicity": "magma",
-    "languages": "inferno",
-    "audience_interests": "cubehelix",
-    "household_income": "plasma",
+# Sections
+sections = {
+    "Followers": "followers",
+    "Quality Audience": "quality_audience",
+    "Followers Growth": "followers_growth",
+    "Engagement Rate": "engagement_rate",
+    "Authentic Engagement": "authentic_engagement",
+    "Most Recent Post": "most_recent_post",
+    "Global and Country Rank": "global_rank",
+    "Top Countries": "top_countries",
+    "Age & Gender": "age_gender",
+    "Ethnicity": "ethnicity",
+    "Languages": "languages",
+    "Estimated Reach": "estimated_reach",
+    "Estimated Impressions": "estimated_impressions",
+    "Audience Interests": "audience_interests",
+    "Household Income": "household_income",
+    "Education Level": "education_level",
+    "Marital Status": "marital_status",
+    "Employment Status": "employment_status",
+    "Device Usage": "device_usage",
+    "Social Media Platforms": "social_media_platforms",
+    "Content Preferences": "content_preferences",
+    "Brand Engagement": "brand_engagement",
+    "Post Frequency": "post_frequency",
+    "Content Themes": "content_themes",
+    "Sponsored Content": "sponsored_content",
+    "Influencer Collaborations": "influencer_collaborations",
+    "User Sentiment": "user_sentiment",
+    "Engagement Trends": "engagement_trends",
+    "Content Virality": "content_virality",
+    "Audience Location": "audience_location",
+    "Audience Age Range": "audience_age_range",
+    "Content Format Preferences": "content_format_preferences",
+    "Influencer Marketing Interest": "influencer_marketing_interest",
+    "Social Causes Support": "social_causes_support",
 }
 
-for key in color_palettes.keys():
-    st.write(f"#### {key.replace('_', ' ').title()}")
-    chart_buffer = create_seaborn_chart(data[key], key.replace('_', ' ').title(), color_palettes[key])
-    st.image(chart_buffer)
+# Display sections
+for section, data_key in sections.items():
+    st.header(section)
+    if section == "Top Countries":
+        st.text("Top Countries")
+        df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Greens_d")
+        ax.set_xlabel('Country', fontsize=12)
+        ax.set_ylabel('Percentage', fontsize=12)
+        plt.tight_layout()
+        st.pyplot(fig)
+    elif section in ["Age & Gender", "Ethnicity", "Languages", "Audience Interests", "Household Income", "Education Level", "Marital Status", "Employment Status", "Device Usage", "Social Media Platforms", "Content Preferences", "Brand Engagement", "Post Frequency", "Content Themes", "Sponsored Content", "Influencer Collaborations", "User Sentiment", "Engagement Trends", "Content Virality", "Audience Location", "Audience Age Range", "Content Format Preferences", "Influencer Marketing Interest", "Social Causes Support"]:
+        df = pd.DataFrame.from_dict(data[data_key], orient='index', columns=['Percentage'])
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax = sns.barplot(x=df.index, y='Percentage', data=df, palette="Blues_d")
+        ax.set_xlabel(section, fontsize=10)
+        ax.set_ylabel('Percentage', fontsize=10)
+        plt.tight_layout()
+        st.pyplot(fig)
+    elif section == "Estimated Reach":
+        reach_data = data[data_key]
+        fig, ax = plt.subplots(figsize=(6, 4))
+        reach_values = [f"{value[0]}M - {value[1]}M" for value in reach_data.values()]
+        ax.bar(reach_data.keys(), reach_values, color='orange')
+        ax.set_xlabel('Reach Type', fontsize=10)
+        ax.set_ylabel('Reach Range', fontsize=10)
+        plt.tight_layout()
+        st.pyplot(fig)
+    elif section == "Estimated Impressions":
+        st.text(f"Estimated Impressions: {data[data_key]}M")
+    else:
+        if isinstance(data[data_key], dict):
+            for key, value in data[data_key].items():
+                st.metric(key, value)
+        else:
+            st.metric(section, data[data_key])
 
-# Generate and Download PDF Report
-st.write("### Generate PDF Report")
-if st.button("Download PDF Report"):
+# Generate PDF report
+if st.button("Export Report as PDF"):
     pdf_buffer = create_pdf_report(data)
-    st.download_button(label="Download PDF", data=pdf_buffer, file_name="rick_ross_instagram_report.pdf", mime="application/pdf")
+    st.download_button(
+        label="Download PDF Report",
+        data=pdf_buffer,
+        file_name="Digital_Metrics_Report.pdf",
+        mime="application/pdf"
+    )
+
+# Running the Streamlit App
+if __name__ == "__main__":
+    st.run()
